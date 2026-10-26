@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MolécuLab</title>
+<meta name="description" content="Chimie, métabolisation et toxicologie d'une molécule à partir de sa DCI ou de son SMILES, chaque valeur portant sa source et son niveau de preuve.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap hbar">
+    <h1 class="brand">Molécu<span>Lab</span></h1>
+    <p class="tag">Chimie, métabolisation et toxicologie à partir d'une DCI ou d'un SMILES. Chaque ligne porte sa source.</p>
+    <nav>
+      <button data-view="analyse" aria-current="true">Analyse</button>
+      <button data-view="corrections">Corrections</button>
+      <button data-view="methode">Méthode</button>
+      <button data-view="reglages">Réglages</button>
+      <button id="theme" type="button" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ===================== ANALYSE ===================== -->
+  <section id="v-analyse">
+    <div class="cols">
+      <div class="stack">
+
+        <div class="card">
+          <div class="head"><h2>Définir la molécule</h2></div>
+          <div class="body">
+            <form id="f">
+              <div class="fieldrow">
+                <label class="f" for="dci">DCI ou nom</label>
+                <input type="text" id="dci" name="dci" placeholder="alfentanil" autocomplete="off">
+              </div>
+              <div class="fieldrow">
+                <label class="f" for="smiles">SMILES (facultatif)</label>
+                <input type="text" id="smiles" name="smiles" spellcheck="false" autocomplete="off"
+                  placeholder="CCC(=O)N(c1ccccc1)C1(COC)CCN(CCn2nnn(CC)c2=O)CC1">
+                <p class="hint">L'un des deux suffit.</p>
+              </div>
+              <details class="m" style="margin-bottom:10px">
+                <summary>Dose (facultatif)</summary>
+                <p class="hint" style="margin-top:8px">Sans dose, Cmax, AUC et Css sont donnés normalisés par la dose. Avec une dose, ils sont calculés en valeurs absolues. Le schéma de l'UEL prévoit la dose en entrée.</p>
+                <div class="row" style="margin-top:8px">
+                  <input type="text" id="dose" placeholder="500 mg" style="flex:1 1 120px" autocomplete="off">
+                  <select id="voie" style="flex:1 1 120px">
+                    <option value="">voie orale</option>
+                    <option>voie intraveineuse</option>
+                    <option>voie intramusculaire</option>
+                    <option>voie sous-cutanée</option>
+                    <option>voie transdermique</option>
+                    <option>voie inhalée</option>
+                  </select>
+                  <input type="text" id="tau" placeholder="toutes les 8 h" style="flex:1 1 120px" autocomplete="off">
+                </div>
+              </details>
+              <button class="go" id="go" type="submit">Analyser la molécule</button>
+            </form>
+            <div class="examples">
+              <span class="eyebrow" style="align-self:center">Exemples</span>
+              <button type="button" data-ex="paracétamol">paracétamol</button>
+              <button type="button" data-ex="alfentanil">alfentanil</button>
+              <button type="button" data-ex="clopidogrel">clopidogrel</button>
+              <button type="button" data-ex="irinotécan">irinotécan</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="pipecard" hidden>
+          <div class="head"><h2>Cheminement</h2></div>
+          <div class="body">
+            <ol class="pipe" id="pipe">
+              <li data-step="id"><span class="dot"></span><span>Identité, SMILES canonique et chimie</span></li>
+              <li data-step="met"><span class="dot"></span><span>Métabolites phase I et II</span></li>
+              <li data-step="tox"><span class="dot"></span><span>Toxicité de la molécule mère et des métabolites</span></li>
+              <li data-step="pk"><span class="dot"></span><span>Pharmacocinétique, puis fusion par rubrique</span></li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="card" id="toolscard" hidden>
+          <div class="head"><h2>Outils de référence</h2></div>
+          <div class="body">
+            <p class="hint" style="margin-top:0">Ces moteurs n'acceptent pas d'être appelés depuis un autre site. Ouvre-les avec le SMILES copié, puis colle leur résultat ci-dessous : il devient une source prioritaire dans les fiches.</p>
+            <div class="row" style="margin-bottom:10px">
+              <button class="ghost" id="copysmi" type="button">Copier le SMILES</button>
+              <span class="hint" id="copyok" hidden>copié</span>
+            </div>
+            <div class="tools" id="tools"></div>
+            <details class="m" style="margin-top:12px">
+              <summary>Importer un résultat d'outil</summary>
+              <div class="fieldrow" style="margin-top:8px">
+                <label class="f" for="impsrc">Source</label>
+                <select id="impsrc">
+                  <option>BioTransformer 3.0</option>
+                  <option>GLORYx</option>
+                  <option>ADMETlab 3.0</option>
+                  <option>ProTox 3.0</option>
+                  <option>RCP / BDPM</option>
+                  <option>Publication (PubMed)</option>
+                </select>
+              </div>
+              <div class="fieldrow">
+                <label class="f" for="impdata">Résultat collé (CSV, tableau ou texte)</label>
+                <textarea id="impdata" placeholder="Colle ici le CSV ou le tableau renvoyé par l'outil."></textarea>
+              </div>
+              <button class="ghost" id="impgo" type="button">Fusionner dans les fiches</button>
+              <div id="imperr"></div>
+            </details>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="stack" id="out">
+        <div class="card"><div class="empty">
+          <h2>Aucune analyse en cours</h2>
+          <p>Saisis une DCI ou un SMILES. L'application part de la structure, en déduit les métabolites de phase I et II, puis cherche la toxicité de la molécule mère <em>et</em> de chaque métabolite majeur, avant de rassembler le tout par domaine.</p>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CORRECTIONS ===================== -->
+  <section id="v-corrections" hidden>
+    <div class="card narrow">
+      <div class="head">
+        <h2>Corrections documentées</h2>
+        <div class="row" style="margin-left:auto">
+          <button class="ghost" id="corrExport" type="button">Exporter</button>
+          <button class="ghost" id="corrImportBtn" type="button">Importer</button>
+          <input type="file" id="corrImport" accept="application/json" hidden>
+        </div>
+      </div>
+      <div class="body">
+        <p class="hint" style="margin-top:0">Une correction est une valeur que tu as vérifiée et qui remplace la prédiction. Elle est conservée dans ce navigateur, elle prime sur tout calcul, et elle est réinjectée à chaque nouvelle analyse de la même molécule avec ta source. Pour en ajouter une, clique sur <em>corriger</em> au bout de la ligne concernée.</p>
+        <div id="corrlist" style="display:flex;flex-direction:column;gap:9px;margin-top:14px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== METHODE ===================== -->
+  <section id="v-methode" hidden>
+    <div class="card narrow">
+      <div class="head"><h2>Méthode et sources</h2></div>
+      <div class="body" style="display:flex;flex-direction:column;gap:14px">
+        <div>
+          <div class="eyebrow">Ordre de traitement</div>
+          <p style="margin:6px 0 0;font-size:14px">Identité et SMILES canonique, puis chimie à partir de la structure, puis métabolites de phase I et II, puis toxicité de la molécule mère et de chaque métabolite majeur, enfin pharmacocinétique. La toxicité est cherchée <em>après</em> les métabolites, parce qu'un métabolite est souvent le vrai responsable : paracétamol et NAPQI.</p>
+        </div>
+        <div>
+          <div class="eyebrow">Niveaux de preuve affichés sur chaque ligne</div>
+          <ul class="tight">
+            <li><span class="chip A">A</span> valeur humaine mesurée : RCP, base de données publique des médicaments, monographie.</li>
+            <li><span class="chip B">B</span> valeur publiée : article, revue, étude isolée.</li>
+            <li><span class="chip C">C</span> prédiction in silico ou calcul à partir de la structure.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="eyebrow">Fusion des sources</div>
+          <p style="margin:6px 0 0;font-size:14px">Un paramètre n'est pas une valeur mais une liste d'assertions. Deux sources donnant deux valeurs pour la même rubrique sont affichées l'une sous l'autre, chacune avec son étiquette, et un drapeau signale la divergence au lieu de la masquer. Les métabolites sont dédoublonnés par squelette moléculaire et non par nom, pour qu'un même métabolite prédit par deux moteurs tienne une seule ligne portant ses deux sources.</p>
+        </div>
+        <div>
+          <div class="eyebrow">Pharmacocinétique sans dose</div>
+          <p style="margin:6px 0 0;font-size:14px">Biodisponibilité, clairance, volume de distribution, demi-vie, liaison aux protéines, fraction libre, CYP450, conjugaison et transporteurs ne dépendent pas de la dose et sont donnés directement. Cmax, AUC et Css en dépendent par construction (AUC = F·D/CL) : ils sont donnés normalisés par la dose. Tmax, qui ne dépend que de ka et ke, reste calculable sans dose.</p>
+        </div>
+        <div>
+          <div class="eyebrow">Moteurs de référence retenus</div>
+          <ul class="tight">
+            <li><a href="https://bitbucket.org/wishartlab/biotransformer3.0jar/wiki/Usage" target="_blank" rel="noopener">BioTransformer 3.0</a> — métabolites et enzymes, exécutable en local, usage académique.</li>
+            <li><a href="https://nerdd.univie.ac.at/gloryx" target="_blank" rel="noopener">GLORYx</a> — métabolites phase I et II avec score de priorité ; successeur libre <a href="https://github.com/molinfo-vienna/GLORYxR" target="_blank" rel="noopener">GLORYxR</a> en GPL-3.0.</li>
+            <li><a href="https://admetlab3.scbdd.com" target="_blank" rel="noopener">ADMETlab 3.0</a> — ADME et alertes de toxicité, API officielle (<a href="https://academic.oup.com/nar/article/52/W1/W422/7642316" target="_blank" rel="noopener">Nucleic Acids Research 2024</a>).</li>
+            <li><a href="https://tox.charite.de/protox3/" target="_blank" rel="noopener">ProTox 3.0</a> — toxicité d'organe, voies, toxicophores ; interface POST documentée, 250 requêtes par jour et par adresse IP.</li>
+            <li><a href="https://base-donnees-publique.medicaments.gouv.fr/" target="_blank" rel="noopener">Base de données publique des médicaments</a> — RCP français, pour les valeurs humaines mesurées.</li>
+          </ul>
+        </div>
+        <div class="warnbox">Outil pédagogique. Une valeur de niveau C est une prédiction : elle ne vaut pas une donnée clinique et ne sert pas à une décision thérapeutique.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== REGLAGES ===================== -->
+  <section id="v-reglages" hidden>
+    <div class="card narrow">
+      <div class="head"><h2>Réglages</h2></div>
+      <div class="body">
+        <div class="fieldrow">
+          <label class="f" for="apikey">Clé d'API Anthropic</label>
+          <input type="password" id="apikey" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+          <p class="hint">Elle est nécessaire pour lancer une analyse et reste dans le stockage local de <strong>ce</strong> navigateur : elle n'est envoyée qu'à l'API d'Anthropic, jamais à ce site. Ne partage pas cette page avec ta clé enregistrée dessus, et révoque la clé en cas de doute depuis la console Anthropic.</p>
+        </div>
+        <div class="fieldrow">
+          <label class="f" for="model">Modèle</label>
+          <select id="model">
+            <option value="claude-sonnet-5-5">Sonnet 5.5 — rapide, suffisant pour la plupart des molécules</option>
+            <option value="claude-opus-5-5">Opus 5.5 — plus lent, meilleur sur les cas complexes</option>
+          </select>
+        </div>
+        <div class="row">
+          <button class="ghost prim" id="savekey" type="button">Enregistrer</button>
+          <button class="ghost" id="clearkey" type="button">Effacer la clé</button>
+          <span class="hint" id="savedok" hidden>enregistré</span>
+        </div>
+        <div class="warnbox" style="margin-top:14px">Une clé posée dans un navigateur convient à un usage personnel et à une démonstration. Pour un site ouvert à d'autres, il faut un petit serveur qui garde la clé et qui exécute aussi BioTransformer et GLORYxR : c'est l'étape suivante, pas un détail de réglage.</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  MolécuLab — projet d'UEL. Outil pédagogique, sans valeur clinique.
+</footer>
+
+<dialog id="dlg"><form class="body" id="dlgf">
+  <h2>Corriger une valeur</h2>
+  <p class="hint" id="dlgwhat" style="margin-top:0"></p>
+  <div class="fieldrow"><label class="f" for="cval">Valeur juste</label><input type="text" id="cval" required placeholder="1,5 h"></div>
+  <div class="fieldrow"><label class="f" for="csrc">Source</label><input type="text" id="csrc" required placeholder="RCP Alfentanil, BDPM, rubrique 5.2"></div>
+  <div class="fieldrow"><label class="f" for="cnote">Commentaire</label><textarea id="cnote" style="min-height:60px" placeholder="Ce que la prédiction a raté, et pourquoi."></textarea></div>
+  <div class="row" style="justify-content:flex-end">
+    <button type="button" class="ghost" id="dlgcancel">Annuler</button>
+    <button type="submit" class="ghost prim">Enregistrer</button>
+  </div>
+</form></dialog>
+
+<script src="js/app.js"></script>
+</body>
+</html>
