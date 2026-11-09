@@ -2,235 +2,1296 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>MolécuLab</title>
-<meta name="description" content="Chimie, métabolisation et toxicologie d'une molécule à partir de sa DCI ou de son SMILES, chaque valeur portant sa source et son niveau de preuve.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="css/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MolécuLab UEL</title>
+<meta name="description" content="Chimie, pharmacocinétique et toxicologie d'une molécule, réunies dans un dossier sourcé.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Espace de travail : barre d'onglets, en-tête éditorial, puis cartes d'étape et de domaine sur une grille à 12 colonnes. */
+:root{
+  --bg:#F3F6F6; --surface:#FFFFFF; --sunk:#E9EFEF; --ink:#13232B; --ink-2:#4A5C63; --ink-3:#7C8C91;
+  --line:#D5DFDF; --accent:#0E6B63; --accent-ink:#FFFFFF; --accent-soft:#DCEEEB;
+  --A:#1F7A3E; --A-bg:#E2F3E7; --B:#2457A6; --B-bg:#E3ECF9; --C:#8A5A00; --C-bg:#F7EDD6;
+  --crit:#A3292C; --crit-bg:#F9E3E2; --warn-bg:#FBF3E0;
+  --f-display:"Newsreader", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1719; --surface:#172225; --sunk:#1E2B2F; --ink:#E4EDEE; --ink-2:#A6B6BA; --ink-3:#74868B;
+  --line:#2B3A3E; --accent:#4FC2B4; --accent-ink:#06211E; --accent-soft:#183A37;
+  --A:#6FD08F; --A-bg:#16301F; --B:#8AB4F2; --B-bg:#172640; --C:#E3B65C; --C-bg:#33270F;
+  --crit:#F08A86; --crit-bg:#3A1A1A; --warn-bg:#2E2614; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1719; --surface:#172225; --sunk:#1E2B2F; --ink:#E4EDEE; --ink-2:#A6B6BA; --ink-3:#74868B;
+  --line:#2B3A3E; --accent:#4FC2B4; --accent-ink:#06211E; --accent-soft:#183A37;
+  --A:#6FD08F; --A-bg:#16301F; --B:#8AB4F2; --B-bg:#172640; --C:#E3B65C; --C-bg:#33270F;
+  --crit:#F08A86; --crit-bg:#3A1A1A; --warn-bg:#2E2614; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.hint{font-size:13px;color:var(--ink-3)}
+
+/* en-tête */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.hbar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-block:12px}
+.brand{display:flex;align-items:baseline;gap:8px;text-decoration:none;color:var(--ink)}
+.brand b{font-family:var(--f-display);font-size:24px;font-weight:600;letter-spacing:-.01em}
+.brand b i{font-style:italic;font-weight:400;color:var(--accent)}
+.brand span{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;color:var(--ink-3)}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:none;border:0;border-radius:8px;padding:7px 12px;cursor:pointer;color:var(--ink-2);font-weight:500;display:inline-flex;align-items:center;gap:7px}
+nav button:hover{background:var(--sunk)}
+nav button[aria-current="true"]{background:var(--accent-soft);color:var(--accent)}
+.count{font-family:var(--f-mono);font-size:11.5px;background:var(--sunk);color:var(--ink-2);border-radius:20px;padding:0 7px;min-width:20px;text-align:center}
+nav button[aria-current="true"] .count{background:var(--accent);color:var(--accent-ink)}
+.who{margin-left:auto;display:flex;align-items:center;gap:10px}
+.priv{display:flex;flex-direction:column;line-height:1.2;text-align:right}
+.priv strong{font-size:13px;font-weight:600}
+.priv small{font-size:11.5px;color:var(--ink-3);display:inline-flex;gap:5px;align-items:center;justify-content:flex-end}
+.priv small::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--A)}
+#theme{background:var(--sunk);border:1px solid var(--line);border-radius:8px;width:34px;height:34px;cursor:pointer}
+
+/* héros */
+.hero{padding-block:44px 28px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end}
+.hero h1{font-family:var(--f-display);font-weight:400;font-size:clamp(34px,5.4vw,58px);line-height:1.04;letter-spacing:-.02em;margin:10px 0 12px;text-wrap:balance}
+.hero h1 em{color:var(--accent)}
+.hero p{margin:0;max-width:56ch;color:var(--ink-2);font-size:17px}
+.badge{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.12em;border:1px solid var(--line);border-radius:6px;padding:6px 10px;color:var(--ink-2);background:var(--surface);white-space:nowrap}
+@media (max-width:640px){.hero{grid-template-columns:1fr}.badge{justify-self:start}.who{margin-left:0}}
+
+/* cartes */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.step-h{display:flex;align-items:baseline;gap:14px;padding:18px 22px;border-bottom:1px solid var(--line)}
+.step-h .n{font-family:var(--f-mono);font-size:13px;color:var(--accent)}
+.step-h h2{font-family:var(--f-display);font-size:24px;font-weight:600;margin:0}
+.step-b{padding:20px 22px;display:flex;flex-direction:column;gap:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-size:13px;font-weight:600;color:var(--ink-2)}
+input[type=text],input[type=number],select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0}
+textarea{min-height:76px;resize:vertical}
+.mono{font-family:var(--f-mono);font-size:13.5px}
+.inline{display:flex;gap:8px}
+.inline > :first-child{flex:1}
+.inline select{width:auto;flex:0 0 auto}
+.ghost{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 13px;cursor:pointer;font-weight:500;white-space:nowrap}
+.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.pk{background:var(--sunk);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.pk-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.pk-h strong{font-weight:600}
+.pk input,.pk select{background:var(--surface)}
+.submit{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:4px}
+.trace{display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--ink-2)}
+.trace::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--accent)}
+.go{background:var(--accent);color:var(--accent-ink);border:0;border-radius:9px;padding:12px 22px;font-weight:600;cursor:pointer;font-size:15px}
+.go:disabled{opacity:.6;cursor:progress}
+.filetag{font-size:12.5px;color:var(--ink-2);display:flex;gap:8px;align-items:center}
+.filetag button{background:none;border:0;color:var(--crit);cursor:pointer;font-size:12.5px;padding:0}
+
+.domains{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-block:22px}
+@media (max-width:900px){.domains{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:480px){.domains{grid-template-columns:1fr}}
+.dom{padding:18px;display:flex;flex-direction:column;gap:6px}
+.dom h3{font-family:var(--f-display);font-size:21px;font-weight:600;margin:0}
+.dom p{margin:0;color:var(--ink-2);font-size:14px}
+.dom .n{margin-top:auto;padding-top:10px;font-family:var(--f-mono);font-size:12px;color:var(--ink-3)}
+.dom .n b{color:var(--accent);font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;margin-right:4px}
+
+.cta{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:22px;margin-bottom:34px;background:var(--accent-soft);border-color:transparent}
+.cta h3{font-family:var(--f-display);font-size:24px;font-weight:400;margin:0}
+.cta p{margin:2px 0 0;color:var(--ink-2);font-size:14px}
+
+footer{border-top:1px solid var(--line);padding-block:18px 26px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--ink-3)}
+footer strong{color:var(--ink-2);font-weight:600}
+
+/* dossiers */
+.layout{display:grid;grid-template-columns:280px 1fr;gap:20px;padding-block:28px 34px;align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:1fr}}
+.list{display:flex;flex-direction:column;gap:6px}
+.item{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer}
+.item[aria-current="true"]{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+.item strong{font-weight:600}
+.item small{color:var(--ink-3);font-size:12px}
+.empty{padding:28px 22px;text-align:center;color:var(--ink-2)}
+.empty h2{font-family:var(--f-display);font-weight:400;font-size:26px;margin:0 0 8px;color:var(--ink)}
+.dos{display:flex;flex-direction:column;gap:16px;min-width:0}
+.dos-h{padding:20px 22px;display:flex;flex-direction:column;gap:12px}
+.dos-h .top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.dos-h h2{font-family:var(--f-display);font-size:34px;font-weight:600;margin:0;letter-spacing:-.01em}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.meta div{min-width:0}
+.meta .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-family:var(--f-mono)}
+.meta .v{font-family:var(--f-mono);font-size:13px;word-break:break-all}
+.pipe{display:flex;gap:8px;flex-wrap:wrap;list-style:none;margin:0;padding:0}
+.pipe li{font-size:12.5px;border:1px solid var(--line);border-radius:20px;padding:3px 11px;color:var(--ink-3)}
+.pipe li[data-s="run"]{color:var(--accent);border-color:var(--accent)}
+.pipe li[data-s="run"]::before{content:"● ";animation:blink 1s infinite}
+.pipe li[data-s="done"]{color:var(--A);border-color:var(--A);background:var(--A-bg)}
+.pipe li[data-s="done"]::before{content:"✓ "}
+.pipe li[data-s="fail"]{color:var(--crit);border-color:var(--crit);background:var(--crit-bg)}
+@keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.pipe li[data-s="run"]::before{animation:none}}
+.smicheck{font-size:12.5px;display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+.smicheck.ok{color:var(--A)} .smicheck.ko{color:var(--crit)}
+.smicheck b{font-family:var(--f-mono);font-weight:500;color:var(--ink-2)}
+
+/* descripteurs calculés */
+.calc{background:var(--sunk);border-radius:8px;padding:14px 16px;margin-top:14px}
+.calc-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline;margin-bottom:10px}
+.calc-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 14px}
+.calc-g .k{font-size:11.5px;color:var(--ink-3)}
+.calc-g .v{font-family:var(--f-mono);font-size:13.5px;font-variant-numeric:tabular-nums}
+.rules{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.rule{font-size:12.5px;border-radius:6px;padding:3px 9px}
+.rule.ok{color:var(--A);background:var(--A-bg)} .rule.no{color:var(--C);background:var(--C-bg)}
+
+/* ionisation */
+.ions{display:flex;flex-direction:column;gap:8px}
+.ion{display:grid;grid-template-columns:auto auto auto 1fr;gap:6px 10px;align-items:center}
+.ion .nm{font-weight:600;font-size:14px}
+.ion .ty{font-size:11px;border-radius:4px;padding:1px 6px;text-transform:uppercase;letter-spacing:.04em}
+.ion .ty.acide{color:var(--crit);background:var(--crit-bg)}
+.ion .ty.base{color:var(--B);background:var(--B-bg)}
+.ion .ty.neutre,.ion .ty.permanent{color:var(--ink-2);background:var(--line)}
+.pk-in{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--ink-3)}
+.pk-in input{width:72px;padding:4px 7px;background:var(--surface);font-family:var(--f-mono);font-size:13px}
+.ion .fr{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.ion .bar{grid-column:1/-1;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+.ion .bar i{display:block;height:100%;background:var(--accent)}
+@media (max-width:620px){.ion{grid-template-columns:1fr auto}.ion .fr{grid-column:1/-1}}
+
+/* simulateur */
+.sim-in{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.sim-f{display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--ink-3);position:relative}
+.sim-f input,.sim-f select{width:104px;padding:6px 9px;background:var(--surface);font-family:var(--f-mono);font-size:13px}
+.sim-f em{position:absolute;right:9px;bottom:7px;font-style:normal;font-size:11px;color:var(--ink-3);pointer-events:none}
+.plot-cap{font-size:12px;color:var(--ink-3);margin-bottom:4px}
+.plot{width:100%;height:auto;display:block}
+.plot .grid{stroke:var(--line);stroke-width:1}
+.plot .axis{stroke:var(--ink-3);stroke-width:1}
+.plot .ax{fill:var(--ink-3);font-size:11px;font-family:var(--f-mono)}
+.plot .line{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.plot .area{fill:var(--accent);opacity:.12;stroke:none}
+.plot .css{stroke:var(--C);stroke-width:1.5;stroke-dasharray:5 4}
+
+/* métabolites dessinés */
+.met-b{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:start;margin-top:8px}
+@media (max-width:560px){.met-b{grid-template-columns:1fr}}
+.met-draw{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px;display:grid;place-items:center}
+.met-draw svg{width:100%;height:auto;max-width:150px}
+.met.mere{border-color:var(--accent)}
+
+/* page de garde : structure dessinée */
+.garde{display:grid;grid-template-columns:230px 1fr;gap:20px;padding:20px 22px;align-items:start}
+@media (max-width:700px){.garde{grid-template-columns:1fr}}
+.struct{background:var(--bg);border:1px solid var(--line);border-radius:8px;aspect-ratio:1;display:grid;place-items:center;overflow:hidden;max-width:100%}
+.struct canvas{max-width:100%;height:auto}
+.struct .no{font-size:12.5px;color:var(--ink-3);text-align:center;padding:14px;line-height:1.4}
+
+/* tuiles de domaine */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:760px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 14px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;min-width:0}
+.tile:hover{border-color:var(--accent)}
+.tile[aria-current="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.tile svg{width:30px;height:30px;stroke:var(--accent);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tile b{font-family:var(--f-display);font-size:19px;font-weight:600;line-height:1.1}
+.tile small{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.tile[aria-current="true"] small{color:var(--accent)}
+.tile[data-s="run"] small::before{content:"● ";animation:blink 1s infinite}
+.tile[data-s="fail"]{border-color:var(--crit)}
+.tile[data-s="fail"] small{color:var(--crit)}
+.tile[data-s="fail"] svg{stroke:var(--crit)}
+.tile[data-s="wait"] svg,.tile[data-s="run"] svg{opacity:.55}
+.demarche{margin-top:12px}
+.demarche p{margin:6px 0 0;font-size:13.5px;color:var(--ink-2)}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:16px 22px;border-bottom:1px solid var(--line)}
+.sec-h h3{font-family:var(--f-display);font-size:22px;font-weight:600;margin:0}
+.sec-b{padding:6px 22px 18px;min-width:0}
+.sec-b > p{margin:12px 0 4px;font-size:14px;color:var(--ink-2)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td{border-bottom:1px solid var(--line);padding:11px 8px 11px 0;vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.p{width:28%;font-weight:600;min-width:130px}
+.as{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.as + .as{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.val{font-variant-numeric:tabular-nums}
+.chip{font-family:var(--f-mono);font-size:11px;font-weight:500;border-radius:4px;padding:1px 6px}
+.chip.A{color:var(--A);background:var(--A-bg)} .chip.B{color:var(--B);background:var(--B-bg)} .chip.C{color:var(--C);background:var(--C-bg)}
+.src{font-size:12.5px;color:var(--ink-2);font-style:italic}
+.flag{font-size:11px;font-weight:600;color:var(--crit);background:var(--crit-bg);border-radius:4px;padding:1px 6px}
+.note{flex-basis:100%;font-size:12.5px;color:var(--ink-3)}
+.none{color:var(--ink-3);font-size:13px}
+.mets{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.met{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.met .t{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.met .t strong{font-weight:600}
+.met .sm{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);word-break:break-all;margin-top:4px}
+.box{border-radius:8px;padding:12px 14px;font-size:13.5px}
+.box.warn{background:var(--warn-bg)} .box.crit{background:var(--crit-bg);color:var(--crit)}
+.pending{display:flex;gap:10px;align-items:center;padding:14px 0;color:var(--ink-3);font-size:13.5px}
+.pending i{width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.danger:hover{border-color:var(--crit);color:var(--crit)}
+details{font-size:14px} details summary{cursor:pointer;font-weight:600;color:var(--ink-2)}
+details ul{margin:8px 0 0;padding-left:20px}
+
+/* méthode */
+.method{padding-block:28px 34px}
+.method .card{padding:24px;display:flex;flex-direction:column;gap:20px;max-width:820px}
+.method h2{font-family:var(--f-display);font-size:30px;font-weight:600;margin:0}
+.method p{margin:6px 0 0;max-width:68ch}
+.method ul{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px}
+</style>
+<script src="config.js"></script>
 </head>
 <body>
-
 <header>
   <div class="wrap hbar">
-    <h1 class="brand">Molécu<span>Lab</span></h1>
-    <p class="tag">Chimie, métabolisation et toxicologie à partir d'une DCI ou d'un SMILES. Chaque ligne porte sa source.</p>
+    <a class="brand" href="#analyse" data-go="analyse"><b>Molécu<i>Lab</i></b><span>UEL / WORKSPACE</span></a>
     <nav>
-      <button data-view="analyse" aria-current="true">Analyse</button>
-      <button data-view="corrections">Corrections</button>
-      <button data-view="methode">Méthode</button>
-      <button data-view="reglages">Réglages</button>
-      <button id="theme" type="button" title="Changer de thème" aria-label="Changer de thème">◐</button>
+      <button type="button" data-view="analyse">Nouvelle analyse</button>
+      <button type="button" data-view="dossiers">Mes dossiers <span class="count" id="ndos">0</span></button>
+      <button type="button" data-view="methode">Sources &amp; méthode</button>
     </nav>
+    <div class="who">
+      <div class="priv"><strong>Espace personnel</strong><small>Accès privé</small></div>
+      <button id="theme" type="button" aria-label="Changer de thème" title="Changer de thème">◐</button>
+    </div>
   </div>
 </header>
 
-<main class="wrap">
+<main>
+<!-- ================= NOUVELLE ANALYSE ================= -->
+<section id="v-analyse">
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">Pharmacie · Projet UEL</div>
+        <h1>De la structure <em>à la connaissance.</em></h1>
+        <p>Donne une structure, même celle d'une molécule qui n'existe pas encore : chimie, pharmacocinétique, métabolisme et toxicologie en sont déduits, chaque ligne portant la règle ou la source qui la justifie.</p>
+      </div>
+      <span class="badge">VERSION 01</span>
+    </div>
 
-  <!-- ===================== ANALYSE ===================== -->
-  <section id="v-analyse">
-    <div class="cols">
-      <div class="stack">
+    <form class="card" id="f" autocomplete="off">
+      <div class="step-h"><span class="n">ÉTAPE 01</span><h2>Définir la molécule</h2></div>
+      <div class="step-b">
+        <div class="grid2">
+          <div class="field">
+            <label for="dci">DCI / nom de la molécule <span class="hint">facultatif</span></label>
+            <input type="text" id="dci" placeholder="ex. alfentanil, ou un nom de travail">
+          </div>
+          <div class="field">
+            <label for="smiles">Structure SMILES <span class="hint">le point de départ</span></label>
+            <div class="inline">
+              <input type="text" id="smiles" class="mono" spellcheck="false" placeholder="ex. CCC(=O)N(c1ccccc1)C1(COC)CCN(…)CC1">
+              <button type="button" class="ghost" id="impbtn">MOL / SDF</button>
+              <input type="file" id="impfile" accept=".mol,.sdf,.mdl,.txt,chemical/x-mdl-molfile" hidden>
+            </div>
+            <div class="filetag" id="filetag" hidden></div>
+            <div class="smicheck" id="smicheck" hidden></div>
+          </div>
+        </div>
 
-        <div class="card">
-          <div class="head"><h2>Définir la molécule</h2></div>
-          <div class="body">
-            <form id="f">
-              <div class="fieldrow">
-                <label class="f" for="dci">DCI ou nom</label>
-                <input type="text" id="dci" name="dci" placeholder="alfentanil" autocomplete="off">
+        <div class="pk">
+          <div class="pk-h"><strong>Contexte pharmacocinétique</strong><span class="hint">Facultatif. Sans dose, Cmax, AUC et Css sont rendus normalisés par la dose.</span></div>
+          <div class="grid3">
+            <div class="field">
+              <label for="dose">Dose par prise</label>
+              <div class="inline">
+                <input type="number" id="dose" min="0" step="any" placeholder="500">
+                <select id="unit" aria-label="Unité de dose"><option>mg</option><option>µg</option><option>g</option><option>mg/kg</option><option>µg/kg</option></select>
               </div>
-              <div class="fieldrow">
-                <label class="f" for="smiles">SMILES (facultatif)</label>
-                <input type="text" id="smiles" name="smiles" spellcheck="false" autocomplete="off"
-                  placeholder="CCC(=O)N(c1ccccc1)C1(COC)CCN(CCn2nnn(CC)c2=O)CC1">
-                <p class="hint">L'un des deux suffit.</p>
-              </div>
-              <details class="m" style="margin-bottom:10px">
-                <summary>Dose (facultatif)</summary>
-                <p class="hint" style="margin-top:8px">Sans dose, Cmax, AUC et Css sont donnés normalisés par la dose. Avec une dose, ils sont calculés en valeurs absolues. Le schéma de l'UEL prévoit la dose en entrée.</p>
-                <div class="row" style="margin-top:8px">
-                  <input type="text" id="dose" placeholder="500 mg" style="flex:1 1 120px" autocomplete="off">
-                  <select id="voie" style="flex:1 1 120px">
-                    <option value="">voie orale</option>
-                    <option>voie intraveineuse</option>
-                    <option>voie intramusculaire</option>
-                    <option>voie sous-cutanée</option>
-                    <option>voie transdermique</option>
-                    <option>voie inhalée</option>
-                  </select>
-                  <input type="text" id="tau" placeholder="toutes les 8 h" style="flex:1 1 120px" autocomplete="off">
-                </div>
-              </details>
-              <button class="go" id="go" type="submit">Analyser la molécule</button>
-            </form>
-            <div class="examples">
-              <span class="eyebrow" style="align-self:center">Exemples</span>
-              <button type="button" data-ex="paracétamol">paracétamol</button>
-              <button type="button" data-ex="alfentanil">alfentanil</button>
-              <button type="button" data-ex="clopidogrel">clopidogrel</button>
-              <button type="button" data-ex="irinotécan">irinotécan</button>
+            </div>
+            <div class="field">
+              <label for="tau">Intervalle entre prises</label>
+              <input type="text" id="tau" placeholder="ex. toutes les 8 h">
+            </div>
+            <div class="field">
+              <label for="voie">Voie d'administration</label>
+              <select id="voie">
+                <option value="">Non précisée</option><option>Orale</option><option>IV bolus</option><option>IV perfusion</option>
+                <option>Intramusculaire</option><option>Sous-cutanée</option><option>Transdermique</option><option>Inhalée</option><option>Autre</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="form">Formulation</label>
+              <input type="text" id="form" placeholder="ex. comprimé LP, solution injectable">
+            </div>
+            <div class="field">
+              <label for="duree">Durée du traitement</label>
+              <input type="text" id="duree" placeholder="ex. 7 jours, dose unique">
+            </div>
+            <div class="field" id="perfbox">
+              <label for="perf">Durée ou débit de perfusion</label>
+              <input type="text" id="perf" placeholder="ex. 30 min, 1 mg/h">
             </div>
           </div>
         </div>
 
-        <div class="card" id="pipecard" hidden>
-          <div class="head"><h2>Cheminement</h2></div>
-          <div class="body">
-            <ol class="pipe" id="pipe">
-              <li data-step="id"><span class="dot"></span><span>Identité, SMILES canonique et chimie</span></li>
-              <li data-step="met"><span class="dot"></span><span>Métabolites phase I et II</span></li>
-              <li data-step="tox"><span class="dot"></span><span>Toxicité de la molécule mère et des métabolites</span></li>
-              <li data-step="pk"><span class="dot"></span><span>Pharmacocinétique, puis fusion par rubrique</span></li>
-            </ol>
-          </div>
+        <div class="submit">
+          <span class="trace">Descripteurs calculés sur la structure · prédictions raisonnées à partir d'eux</span>
+          <button class="go" id="go" type="submit">Analyser la molécule</button>
         </div>
-
-        <div class="card" id="toolscard" hidden>
-          <div class="head"><h2>Outils de référence</h2></div>
-          <div class="body">
-            <p class="hint" style="margin-top:0">Ces moteurs n'acceptent pas d'être appelés depuis un autre site. Ouvre-les avec le SMILES copié, puis colle leur résultat ci-dessous : il devient une source prioritaire dans les fiches.</p>
-            <div class="row" style="margin-bottom:10px">
-              <button class="ghost" id="copysmi" type="button">Copier le SMILES</button>
-              <span class="hint" id="copyok" hidden>copié</span>
-            </div>
-            <div class="tools" id="tools"></div>
-            <details class="m" style="margin-top:12px">
-              <summary>Importer un résultat d'outil</summary>
-              <div class="fieldrow" style="margin-top:8px">
-                <label class="f" for="impsrc">Source</label>
-                <select id="impsrc">
-                  <option>BioTransformer 3.0</option>
-                  <option>GLORYx</option>
-                  <option>ADMETlab 3.0</option>
-                  <option>ProTox 3.0</option>
-                  <option>RCP / BDPM</option>
-                  <option>Publication (PubMed)</option>
-                </select>
-              </div>
-              <div class="fieldrow">
-                <label class="f" for="impdata">Résultat collé (CSV, tableau ou texte)</label>
-                <textarea id="impdata" placeholder="Colle ici le CSV ou le tableau renvoyé par l'outil."></textarea>
-              </div>
-              <button class="ghost" id="impgo" type="button">Fusionner dans les fiches</button>
-              <div id="imperr"></div>
-            </details>
-          </div>
-        </div>
-
+        <div id="ferr"></div>
       </div>
+    </form>
 
-      <div class="stack" id="out">
-        <div class="card"><div class="empty">
-          <h2>Aucune analyse en cours</h2>
-          <p>Saisis une DCI ou un SMILES. L'application part de la structure, en déduit les métabolites de phase I et II, puis cherche la toxicité de la molécule mère <em>et</em> de chaque métabolite majeur, avant de rassembler le tout par domaine.</p>
-        </div></div>
-      </div>
+    <div class="domains">
+      <div class="card dom"><div class="eyebrow">Étape 01</div><h3>Chimie</h3><p>Fonctions lues sur la structure, pKa, lipophilie, solubilité, TPSA.</p><div class="n"><b>9</b>paramètres</div></div>
+      <div class="card dom"><div class="eyebrow">Étape 02</div><h3>Pharmacocinétique</h3><p>Absorption, distribution et exposition, déduites de cette chimie.</p><div class="n"><b>10</b>paramètres</div></div>
+      <div class="card dom"><div class="eyebrow">Étape 03</div><h3>Métabolisme</h3><p>Sites métabolisables, enzymes, transporteurs, métabolites prédits.</p><div class="n"><b>5</b>paramètres</div></div>
+      <div class="card dom"><div class="eyebrow">Étape 04</div><h3>Toxicologie</h3><p>Risque de la molécule mère et de chaque métabolite majeur.</p><div class="n"><b>10</b>paramètres</div></div>
     </div>
-  </section>
 
-  <!-- ===================== CORRECTIONS ===================== -->
-  <section id="v-corrections" hidden>
-    <div class="card narrow">
-      <div class="head">
-        <h2>Corrections documentées</h2>
-        <div class="row" style="margin-left:auto">
-          <button class="ghost" id="corrExport" type="button">Exporter</button>
-          <button class="ghost" id="corrImportBtn" type="button">Importer</button>
-          <input type="file" id="corrImport" accept="application/json" hidden>
-        </div>
-      </div>
-      <div class="body">
-        <p class="hint" style="margin-top:0">Une correction est une valeur que tu as vérifiée et qui remplace la prédiction. Elle est conservée dans ce navigateur, elle prime sur tout calcul, et elle est réinjectée à chaque nouvelle analyse de la même molécule avec ta source. Pour en ajouter une, clique sur <em>corriger</em> au bout de la ligne concernée.</p>
-        <div id="corrlist" style="display:flex;flex-direction:column;gap:9px;margin-top:14px"></div>
-      </div>
+    <div class="card cta">
+      <div><h3>Ton prochain dossier commence ici</h3><p>Saisis une DCI ou un SMILES, ou pars d'un exemple déjà rempli.</p></div>
+      <button type="button" class="ghost" id="ex">Préremplir avec l'alfentanil</button>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ===================== METHODE ===================== -->
-  <section id="v-methode" hidden>
-    <div class="card narrow">
-      <div class="head"><h2>Méthode et sources</h2></div>
-      <div class="body" style="display:flex;flex-direction:column;gap:14px">
-        <div>
-          <div class="eyebrow">Ordre de traitement</div>
-          <p style="margin:6px 0 0;font-size:14px">Identité et SMILES canonique, puis chimie à partir de la structure, puis métabolites de phase I et II, puis toxicité de la molécule mère et de chaque métabolite majeur, enfin pharmacocinétique. La toxicité est cherchée <em>après</em> les métabolites, parce qu'un métabolite est souvent le vrai responsable : paracétamol et NAPQI.</p>
-        </div>
-        <div>
-          <div class="eyebrow">Niveaux de preuve affichés sur chaque ligne</div>
-          <ul class="tight">
-            <li><span class="chip A">A</span> valeur humaine mesurée : RCP, base de données publique des médicaments, monographie.</li>
-            <li><span class="chip B">B</span> valeur publiée : article, revue, étude isolée.</li>
-            <li><span class="chip C">C</span> prédiction in silico ou calcul à partir de la structure.</li>
-          </ul>
-        </div>
-        <div>
-          <div class="eyebrow">Fusion des sources</div>
-          <p style="margin:6px 0 0;font-size:14px">Un paramètre n'est pas une valeur mais une liste d'assertions. Deux sources donnant deux valeurs pour la même rubrique sont affichées l'une sous l'autre, chacune avec son étiquette, et un drapeau signale la divergence au lieu de la masquer. Les métabolites sont dédoublonnés par squelette moléculaire et non par nom, pour qu'un même métabolite prédit par deux moteurs tienne une seule ligne portant ses deux sources.</p>
-        </div>
-        <div>
-          <div class="eyebrow">Pharmacocinétique sans dose</div>
-          <p style="margin:6px 0 0;font-size:14px">Biodisponibilité, clairance, volume de distribution, demi-vie, liaison aux protéines, fraction libre, CYP450, conjugaison et transporteurs ne dépendent pas de la dose et sont donnés directement. Cmax, AUC et Css en dépendent par construction (AUC = F·D/CL) : ils sont donnés normalisés par la dose. Tmax, qui ne dépend que de ka et ke, reste calculable sans dose.</p>
-        </div>
-        <div>
-          <div class="eyebrow">Moteurs de référence retenus</div>
-          <ul class="tight">
-            <li><a href="https://bitbucket.org/wishartlab/biotransformer3.0jar/wiki/Usage" target="_blank" rel="noopener">BioTransformer 3.0</a> — métabolites et enzymes, exécutable en local, usage académique.</li>
-            <li><a href="https://nerdd.univie.ac.at/gloryx" target="_blank" rel="noopener">GLORYx</a> — métabolites phase I et II avec score de priorité ; successeur libre <a href="https://github.com/molinfo-vienna/GLORYxR" target="_blank" rel="noopener">GLORYxR</a> en GPL-3.0.</li>
-            <li><a href="https://admetlab3.scbdd.com" target="_blank" rel="noopener">ADMETlab 3.0</a> — ADME et alertes de toxicité, API officielle (<a href="https://academic.oup.com/nar/article/52/W1/W422/7642316" target="_blank" rel="noopener">Nucleic Acids Research 2024</a>).</li>
-            <li><a href="https://tox.charite.de/protox3/" target="_blank" rel="noopener">ProTox 3.0</a> — toxicité d'organe, voies, toxicophores ; interface POST documentée, 250 requêtes par jour et par adresse IP.</li>
-            <li><a href="https://base-donnees-publique.medicaments.gouv.fr/" target="_blank" rel="noopener">Base de données publique des médicaments</a> — RCP français, pour les valeurs humaines mesurées.</li>
-          </ul>
-        </div>
-        <div class="warnbox">Outil pédagogique. Une valeur de niveau C est une prédiction : elle ne vaut pas une donnée clinique et ne sert pas à une décision thérapeutique.</div>
+<!-- ================= MES DOSSIERS ================= -->
+<section id="v-dossiers" hidden>
+  <div class="wrap layout">
+    <aside class="list" id="list"></aside>
+    <div class="dos" id="dos"></div>
+  </div>
+</section>
+
+<!-- ================= SOURCES & MÉTHODE ================= -->
+<section id="v-methode" hidden>
+  <div class="wrap method">
+    <div class="card">
+      <h2>Sources &amp; méthode</h2>
+      <div>
+        <div class="eyebrow">Ordre de traitement</div>
+        <p>Quatre étapes enchaînées, chacune nourrie par les résultats de la précédente : <strong>chimie</strong>, puis <strong>pharmacocinétique</strong>, puis <strong>métabolisme</strong>, puis <strong>toxicologie</strong>.</p>
+        <ul>
+          <li><strong>Chimie.</strong> Lue sur la structure : fonctions, pKa, logP, TPSA, solubilité. Rien ne peut être prédit avant elle.</li>
+          <li><strong>Pharmacocinétique.</strong> Déduite de cette chimie : l'absorption de la lipophilie et de la TPSA, le Vd de l'ionisation et de la liaison protéique, la clairance de la stabilité des fonctions portées.</li>
+          <li><strong>Métabolisme.</strong> Les sites métabolisables sont cherchés sur la structure, et la clairance prédite à l'étape précédente dit lesquels comptent vraiment. Cette étape peut corriger t½ et CL : elle le signale alors explicitement.</li>
+          <li><strong>Toxicologie.</strong> En dernier, parce qu'elle a besoin des trois autres : la toxicité est cherchée sur la molécule mère <em>et</em> sur chaque métabolite majeur, en tenant compte de l'exposition prédite. Le paracétamol n'est pas toxique, le NAPQI l'est.</li>
+        </ul>
       </div>
-    </div>
-  </section>
-
-  <!-- ===================== REGLAGES ===================== -->
-  <section id="v-reglages" hidden>
-    <div class="card narrow">
-      <div class="head"><h2>Réglages</h2></div>
-      <div class="body">
-        <div class="fieldrow">
-          <label class="f" for="apikey">Clé d'API Anthropic</label>
-          <input type="password" id="apikey" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
-          <p class="hint">Elle est nécessaire pour lancer une analyse et reste dans le stockage local de <strong>ce</strong> navigateur : elle n'est envoyée qu'à l'API d'Anthropic, jamais à ce site. Ne partage pas cette page avec ta clé enregistrée dessus, et révoque la clé en cas de doute depuis la console Anthropic.</p>
-        </div>
-        <div class="fieldrow">
-          <label class="f" for="model">Modèle</label>
-          <select id="model">
-            <option value="claude-sonnet-5-5">Sonnet 5.5 — rapide, suffisant pour la plupart des molécules</option>
-            <option value="claude-opus-5-5">Opus 5.5 — plus lent, meilleur sur les cas complexes</option>
-          </select>
-        </div>
-        <div class="row">
-          <button class="ghost prim" id="savekey" type="button">Enregistrer</button>
-          <button class="ghost" id="clearkey" type="button">Effacer la clé</button>
-          <span class="hint" id="savedok" hidden>enregistré</span>
-        </div>
-        <div class="warnbox" style="margin-top:14px">Une clé posée dans un navigateur convient à un usage personnel et à une démonstration. Pour un site ouvert à d'autres, il faut un petit serveur qui garde la clé et qui exécute aussi BioTransformer et GLORYxR : c'est l'étape suivante, pas un détail de réglage.</div>
+      <div>
+        <div class="eyebrow">Ce qui est calculé, et ce qui est prédit</div>
+        <p>Les descripteurs sont <strong>calculés</strong> dans le navigateur par <a href="https://github.com/cheminfo/openchemlib-js" target="_blank" rel="noopener">OpenChemLib</a>, sur le graphe moléculaire lu depuis le SMILES : formule brute, masse molaire et masse exacte, atomes lourds, cycles et cycles aromatiques, cLogP, logS, TPSA, donneurs et accepteurs de liaisons hydrogène, liaisons rotables, centres stéréogènes, charge formelle, puis les règles de Lipinski et de Veber. Ces valeurs ne dépendent d'aucun modèle de langage : c'est le même calcul qui tourne à chaque fois, et il est aussi fait pendant la saisie, sous le champ SMILES. Elles sont ensuite données au moteur, qui prédit à partir d'elles au lieu de les estimer. cLogP et logS restent des valeurs calculées par un modèle de fragments, à une unité log près.</p>
       </div>
+      <div>
+        <div class="eyebrow">Prédire, pas recopier</div>
+        <p>L'analyse part de la structure et raisonne. Pour une molécule connue, les valeurs humaines mesurées sont données en premier, parce qu'une mesure vaut mieux qu'une prédiction. Pour une molécule qui n'existe pas, tout est prédit : chaque ligne nomme alors la règle, le modèle ou l'analogie employés (règle de Lipinski, équation de Henderson-Hasselbalch, analogie avec une série connue, toxicophore reconnu), et la démarche est résumée en haut de chaque domaine.</p>
+      </div>
+      <div>
+        <div class="eyebrow">Niveau de preuve affiché sur chaque ligne</div>
+        <ul>
+          <li><span class="chip A">A</span> valeur humaine mesurée : RCP, base de données publique des médicaments, monographie.</li>
+          <li><span class="chip B">B</span> valeur publiée : article indexé dans PubMed, revue.</li>
+          <li><span class="chip C">C</span> prédiction in silico ou calcul à partir de la structure.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="eyebrow">Traçabilité avant interprétation</div>
+        <p>Un paramètre est une liste d'assertions, chacune avec sa source. Deux sources qui divergent restent affichées toutes les deux, avec un drapeau. Un paramètre sans donnée fiable reste vide plutôt que d'être comblé par un chiffre inventé.</p>
+      </div>
+      <div>
+        <div class="eyebrow">Pharmacocinétique et dose</div>
+        <p>F, CL, Vd, t½, liaison protéique et fraction libre ne dépendent pas de la dose. Cmax, AUC et Css en dépendent (AUC = F·D/CL ; Css,moy = F·D/(CL·τ)) : avec une dose, ils sont calculés et le calcul est posé ; sans dose, ils sont donnés normalisés par la dose.</p>
+      </div>
+      <div>
+        <div class="eyebrow">Outils dont la méthode est reprise, et où vérifier</div>
+        <ul>
+          <li><a href="https://base-donnees-publique.medicaments.gouv.fr/" target="_blank" rel="noopener">Base de données publique des médicaments</a> : RCP français.</li>
+          <li><a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener">PubMed</a> : valeurs humaines publiées.</li>
+          <li><a href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener">PubChem</a> : identité, descripteurs.</li>
+          <li><a href="https://admetlab3.scbdd.com" target="_blank" rel="noopener">ADMETlab 3.0</a> : descripteurs physico-chimiques et modèles ADME, dont les règles sont reprises à l'étape chimie et pharmacocinétique.</li>
+          <li><a href="https://biotransformer.ca/" target="_blank" rel="noopener">BioTransformer 3.0</a> et <a href="https://nerdd.univie.ac.at/gloryx" target="_blank" rel="noopener">GLORYx</a> : prédiction des métabolites par règles de biotransformation appliquées aux sites réactifs, méthode suivie à l'étape métabolisme.</li>
+          <li><a href="https://tox.charite.de/protox3/" target="_blank" rel="noopener">ProTox 3.0</a> : toxicité d'organe et toxicophores, dont la logique de fragments porteurs de risque est suivie à l'étape toxicologie.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="eyebrow">Partager ce site</div>
+        <p>Le lien peut être ouvert par n'importe qui, mais l'analyse ne tourne pas sur un serveur : elle utilise le compte Claude de la personne qui ouvre la page. Pour qu'une camarade puisse lancer une analyse, il lui faut donc être <strong>connectée à claude.ai dans le même navigateur</strong> (un compte gratuit suffit), puis accepter la demande d'autorisation qui s'affiche au premier lancement. Sans connexion, la page s'ouvre quand même : la structure se dessine, les descripteurs se calculent et le simulateur fonctionne, seule l'analyse par le moteur reste indisponible, et la page le dit au lieu de tourner dans le vide.</p>
+      </div>
+      <div class="box warn">Outil d'apprentissage. Les valeurs sont produites par Claude à partir de ses connaissances, sans accès à internet pendant l'analyse : vérifie toute valeur importante dans la source citée. Une ligne de niveau C est une prédiction et ne sert à aucune décision thérapeutique.</div>
     </div>
-  </section>
-
+  </div>
+</section>
 </main>
 
 <footer class="wrap">
-  MolécuLab — projet d'UEL. Outil pédagogique, sans valeur clinique.
+  <span><strong>MolécuLab</strong> Projet UEL · Recherche et apprentissage</span>
+  <span>Traçabilité avant interprétation</span>
 </footer>
 
-<dialog id="dlg"><form class="body" id="dlgf">
-  <h2>Corriger une valeur</h2>
-  <p class="hint" id="dlgwhat" style="margin-top:0"></p>
-  <div class="fieldrow"><label class="f" for="cval">Valeur juste</label><input type="text" id="cval" required placeholder="1,5 h"></div>
-  <div class="fieldrow"><label class="f" for="csrc">Source</label><input type="text" id="csrc" required placeholder="RCP Alfentanil, BDPM, rubrique 5.2"></div>
-  <div class="fieldrow"><label class="f" for="cnote">Commentaire</label><textarea id="cnote" style="min-height:60px" placeholder="Ce que la prédiction a raté, et pourquoi."></textarea></div>
-  <div class="row" style="justify-content:flex-end">
-    <button type="button" class="ghost" id="dlgcancel">Annuler</button>
-    <button type="submit" class="ghost prim">Enregistrer</button>
-  </div>
-</form></dialog>
+<script src="https://cdn.jsdelivr.net/npm/openchemlib@8.14.0/dist/openchemlib-full.js"></script>
+<script>
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem("mlab." + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem("mlab." + k, JSON.stringify(v)); } catch (e) {} }
+};
 
-<script src="js/app.js"></script>
+/* thème */
+function applyTheme(t) { if (t === "dark" || t === "light") document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
+applyTheme(LS.get("theme", "system"));
+$("#theme").addEventListener("click", () => {
+  const o = ["system", "light", "dark"], n = o[(o.indexOf(LS.get("theme", "system")) + 1) % 3];
+  LS.set("theme", n); applyTheme(n);
+  if (!$("#v-dossiers").hidden) renderDossiers();   // la structure est redessinée dans le bon thème
+});
+
+/* onglets */
+const VIEWS = ["analyse", "dossiers", "methode"];
+function show(v) {
+  if (!VIEWS.includes(v)) v = "analyse";
+  VIEWS.forEach(n => $("#v-" + n).hidden = n !== v);
+  $$("nav button").forEach(b => b.setAttribute("aria-current", String(b.dataset.view === v)));
+  if (location.hash.slice(1) !== v) { try { history.replaceState(null, "", "#" + v); } catch (e) {} }
+  if (v === "dossiers") renderDossiers();
+  window.scrollTo(0, 0);
+}
+$$("nav button").forEach(b => b.addEventListener("click", () => show(b.dataset.view)));
+$("[data-go]").addEventListener("click", e => { e.preventDefault(); show("analyse"); });
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+
+/* dossiers */
+let DOS = LS.get("dossiers", []);
+let CUR = DOS[0]?.id || null;
+const save = () => { LS.set("dossiers", DOS); $("#ndos").textContent = DOS.length; };
+$("#ndos").textContent = DOS.length;
+
+/* import MOL / SDF */
+let MOLBLOCK = "", MOLNAME = "";
+$("#impbtn").addEventListener("click", () => $("#impfile").click());
+$("#impfile").addEventListener("change", async e => {
+  const f = e.target.files?.[0]; if (!f) return;
+  const txt = await f.text();
+  MOLBLOCK = txt.split("$$$$")[0].slice(0, 20000); MOLNAME = f.name;
+  const title = MOLBLOCK.split(/\r?\n/)[0].trim();
+  if (title && !$("#dci").value.trim()) $("#dci").value = title;
+  /* Le fichier est converti en SMILES : le reste de l'outil ne travaille que sur le SMILES. */
+  if (window.OCL && !$("#smiles").value.trim()) {
+    try { $("#smiles").value = OCL.Molecule.fromMolfile(MOLBLOCK).toSmiles(); smiCheck(); } catch (err) {}
+  }
+  $("#filetag").hidden = false;
+  $("#filetag").innerHTML = `<span>Structure importée : ${esc(f.name)}</span><button type="button" id="rmfile">retirer</button>`;
+  $("#rmfile").addEventListener("click", () => { MOLBLOCK = ""; MOLNAME = ""; $("#filetag").hidden = true; });
+  e.target.value = "";
+});
+
+/* contrôle immédiat du SMILES saisi : la structure est validée et pesée avant même de lancer l'analyse */
+function smiCheck() {
+  const el = $("#smicheck"), v = $("#smiles").value.trim();
+  if (!v) { el.hidden = true; return; }
+  el.hidden = false;
+  const c = calcDesc(v);
+  if (!c) { el.className = "smicheck ko"; el.textContent = window.OCL ? "SMILES non reconnu." : "Vérification indisponible."; return; }
+  el.className = "smicheck ok";
+  el.innerHTML = `Structure lue : <b>${esc(c.formule)}</b> · <b>${esc(num(c.mw, 2))} g/mol</b> · cLogP <b>${esc(num(c.logP, 2))}</b> · TPSA <b>${esc(num(c.tpsa, 1))} Å²</b>`;
+}
+$("#smiles").addEventListener("input", smiCheck);
+
+/* exemple */
+$("#ex").addEventListener("click", () => {
+  $("#dci").value = "alfentanil";
+  $("#smiles").value = "CCC(=O)N(c1ccccc1)C1(COC)CCN(CCn2nnn(CC)c2=O)CC1";
+  $("#dose").value = "15"; $("#unit").value = "µg/kg"; $("#tau").value = "dose unique";
+  $("#voie").value = "IV bolus"; $("#form").value = "solution injectable"; $("#duree").value = "anesthésie de courte durée"; $("#perf").value = "";
+  smiCheck();
+  window.scrollTo({ top: $("#f").offsetTop - 70, behavior: "smooth" });
+  $("#dci").focus({ preventScroll: true });
+});
+
+/* ---------------- prompts ---------------- */
+const CADRE = `Tu es le moteur de prédiction d'un outil pédagogique de pharmacie, utilisé par un docteur en pharmacie.
+Tu raisonnes À PARTIR DE LA STRUCTURE. La molécule peut être connue, ou n'exister dans aucune base : dans ce dernier cas tout est prédit à partir de la structure, par les règles usuelles de la discipline et par analogie avec des séries connues, et tu réponds quand même.`;
+
+const REGLES = `RÈGLES
+- Tout en français. Les identifiants normalisés (CYP3A4, P-gp, hERG, CAS) restent tels quels.
+- Pour une molécule connue, donne d'abord la valeur humaine mesurée, avec sa source précise (ex. "RCP Rapifen, rubrique 5.2", "Bower S, Hull CJ. Br J Anaesth 1982, 54:871").
+- Pour une prédiction, "source" nomme LA MÉTHODE employée, jamais un site : la règle, le modèle, le fragment ou l'analogie (ex. "Henderson-Hasselbalch sur l'amine tertiaire", "règle de Lipinski", "analogie fentanyl/sufentanil", "toxicophore nitroaromatique", "Crippen cLogP par fragments").
+- "niveau" : "A" valeur humaine mesurée ; "B" valeur publiée ; "C" prédiction ou calcul à partir de la structure.
+- "commentaire" dit COMMENT tu arrives à la valeur, en une phrase : le fragment lu sur la structure, le calcul posé, l'analogie choisie. C'est ce que l'utilisateur vérifie.
+- N'habille jamais une prédiction en mesure : une valeur non mesurée est de niveau "C". Si deux raisonnements ou deux sources crédibles divergent, donne DEUX assertions avec "divergence": true sur chacune. Un paramètre hors de portée reçoit "assertions": [].
+- "demarche" résume en 2 à 4 phrases le raisonnement du domaine : ce que tu lis sur la structure, ce que tu en déduis, ce qui reste incertain.
+- Réponds UNIQUEMENT par le JSON demandé.`;
+const AS = `{"valeur":"","source":"","niveau":"A|B|C","commentaire":"","divergence":false}`;
+
+function mol(d) {
+  return `STRUCTURE À ANALYSER\nSMILES = ${d.calc?.smiles || d.smiles || "(non fourni)"}\nNom ou nom de travail = ${d.dci || "(non fourni)"}`
+    + (d.molblock ? `\nFichier de structure MOL/SDF (${d.molname}) :\n${d.molblock}` : "")
+    + calcPrompt(d.calc) + ionPrompt(d);
+}
+function ctx(d) {
+  const c = d.ctx, l = [];
+  if (c.dose) l.push(`dose par prise ${c.dose} ${c.unit}`);
+  if (c.tau) l.push(`intervalle ${c.tau}`);
+  if (c.voie) l.push(`voie ${c.voie}`);
+  if (c.form) l.push(`formulation ${c.form}`);
+  if (c.duree) l.push(`durée du traitement ${c.duree}`);
+  if (c.perf) l.push(`perfusion ${c.perf}`);
+  return l.join(" ; ");
+}
+function vals(rows) {
+  return (rows || []).map(r => {
+    const a = (r.assertions || [])[0];
+    return a ? `- ${r.parametre} : ${a.valeur}` : null;
+  }).filter(Boolean).join("\n");
+}
+/* Chaque étape reçoit les acquis des précédentes : c'est ce qui fait la chaîne. */
+function acquis(d, keys) {
+  const o = [];
+  if (keys.includes("chim") && d.chimie) o.push("CHIMIE DÉJÀ ÉTABLIE\n" + vals(d.chimie.parametres));
+  if (keys.includes("pk") && d.pharmacocinetique) o.push("PHARMACOCINÉTIQUE DÉJÀ PRÉDITE\n" + vals(d.pharmacocinetique.parametres));
+  if (keys.includes("met") && d.metabolisme) o.push("MÉTABOLISME DÉJÀ ÉTABLI\n" + vals(d.metabolisme.parametres)
+    + "\nMétabolites retenus :\n" + (d.metabolisme.metabolites || []).map(m =>
+      `- ${m.nom}${m.smiles ? " [" + m.smiles + "]" : ""} (${[m.reaction, m.enzyme, m.activite].filter(Boolean).join(", ")})`).join("\n"));
+  return o.length ? "\n\nACQUIS DES ÉTAPES PRÉCÉDENTES — appuie-toi dessus, ne les recalcule pas, et signale-le si tu dois les corriger.\n\n" + o.join("\n\n") : "";
+}
+
+const P = {
+  chim: d => `${CADRE}
+
+${mol(d)}
+
+ÉTAPE 1 sur 4 : identité et chimie. Tout le reste en dépend, donc lis la structure avant tout : squelette, fonctions portées, centres ionisables, encombrement. Méthode des descripteurs d'ADMETlab 3.0 et de PubChem.
+
+${REGLES}
+
+Renvoie exactement :
+{"identite":{"dci":"","statut":"connue|hypothétique","classe":"","indication":"","smiles_canonique":"","formule":"","masse_molaire":"","cas":""},
+ "chimie":{"demarche":"","parametres":[{"parametre":"","assertions":[${AS}]}]}}
+
+"statut" : "connue" si la molécule existe et est documentée, "hypothétique" sinon ; pour une molécule hypothétique, "classe" dit de quelle série chimique elle relève et "indication" l'usage plausible au vu du pharmacophore.
+"chimie.parametres" contient exactement ces 9 paramètres, dans cet ordre : Formule brute ; Masse molaire ; Fonctions chimiques ; pKa ; logP ; logD à pH 7,4 ; Solubilité aqueuse ; Surface polaire (TPSA) ; Donneurs et accepteurs de liaisons H. Pour "Fonctions chimiques", énumère les groupes réellement présents. Pour "pKa", nomme chaque centre ionisable, son caractère acide ou basique, et l'état d'ionisation majoritaire à pH 7,4.`,
+
+  pk: d => {
+    const c = ctx(d);
+    const bloc = d.ctx.dose
+      ? `CONTEXTE SAISI : ${c}. Calcule Cmax, AUC et Css en valeurs absolues à partir de ce contexte (70 kg si la dose est exprimée par kg ; AUC = F·D/CL ; Css,moy = F·D/(CL·τ)), pose le calcul dans "commentaire".`
+      : `AUCUNE dose n'est saisie${c ? " (contexte : " + c + ")" : ""}. Cmax, AUC et Css sont donnés NORMALISÉS par la dose, jamais en valeur absolue, puisque AUC = F·D/CL ; explique-le dans "commentaire".`;
+    return `${CADRE}
+
+${mol(d)}${acquis(d, ["chim"])}
+
+ÉTAPE 2 sur 4 : pharmacocinétique, déduite de la chimie ci-dessus. Raisonne explicitement : l'absorption depuis la lipophilie, la TPSA et la masse (règle de Lipinski, modèles ADME d'ADMETlab 3.0) ; le volume de distribution depuis l'ionisation à pH 7,4, la lipophilie et la liaison aux protéines ; la clairance depuis la stabilité métabolique attendue des fonctions portées ; la demi-vie depuis Vd et CL (t½ = 0,693·Vd/CL). Pour une molécule connue, la valeur humaine mesurée passe devant la prédiction.
+${bloc}
+
+${REGLES}
+
+Renvoie exactement :
+{"pharmacocinetique":{"demarche":"","parametres":[{"parametre":"","assertions":[${AS}]}],"hypotheses":[""],"lacunes":[""]}}
+
+"parametres" contient exactement ces 10 paramètres, dans cet ordre : Biodisponibilité (F) ; Clairance (CL) ; Volume de distribution (Vd) ; Demi-vie d'élimination (t½) ; Cmax ; Tmax ; AUC ; Concentration à l'état d'équilibre (Css) ; Liaison aux protéines plasmatiques ; Fraction libre (fu).
+"hypotheses" : les hypothèses de calcul employées (70 kg, cinétique linéaire, débit sanguin hépatique 90 L/h, modèle du foie bien agité…). "lacunes" : ce qui manque réellement, et quelle donnée le comblerait.`;
+  },
+
+  met: d => `${CADRE}
+
+${mol(d)}${acquis(d, ["chim", "pk"])}
+
+ÉTAPE 3 sur 4 : métabolisme. Méthode de BioTransformer 3.0 et de GLORYx : repère sur la structure les sites métabolisables (positions benzyliques, N- et O-déalkylation, hydroxylation aromatique, oxydation des soufres, esters et amides hydrolysables, groupes conjugables), applique les biotransformations de phase I puis II, et classe les métabolites par importance attendue. La clairance prédite à l'étape 2 dit quelles voies comptent vraiment. Si cette étape t'amène à corriger la clairance ou la demi-vie, dis-le dans "demarche".
+
+${REGLES}
+
+Renvoie exactement :
+{"metabolisme":{"demarche":"","parametres":[{"parametre":"","assertions":[${AS}]}],
+  "metabolites":[{"nom":"","smiles":"","reaction":"","enzyme":"","phase":1,"activite":"actif|inactif|réactif|inconnu","part":"","source":"","niveau":"A|B|C","commentaire":""}]}}
+
+"parametres" contient exactement ces 5 paramètres, dans cet ordre : Enzymes de phase I (CYP450 et autres) ; Conjugaisons de phase II ; Transporteurs (P-gp, OATP, BCRP…) ; Voies métaboliques majeures ; Métabolites actifs ou réactifs.
+"metabolites" : huit au maximum, les plus importants, du plus au moins probable. "smiles" est le SMILES du métabolite, obligatoire. "part" estime la part de la dose métabolisée par cette voie (ex. "voie majeure, ~60 %"). "commentaire" dit quel site de la structure est touché.`,
+
+  tox: d => `${CADRE}
+
+${mol(d)}${acquis(d, ["chim", "pk", "met"])}
+
+ÉTAPE 4 sur 4 : toxicologie, en dernier parce qu'elle a besoin des trois autres. Méthode de ProTox 3.0 : identifie les fragments porteurs de risque sur la molécule mère ET sur chaque métabolite listé ci-dessus, puis pondère par l'exposition prédite à l'étape 2. Un métabolite réactif minoritaire peut porter l'essentiel du risque (paracétamol et NAPQI) : dis-le. Pour chaque paramètre, précise qui porte le risque, la molécule mère ou un métabolite nommé.
+
+${REGLES}
+
+Renvoie exactement :
+{"toxicologie":{"demarche":"","parametres":[{"parametre":"","assertions":[${AS}]}]}}
+
+"parametres" contient exactement ces 10 paramètres, dans cet ordre : Toxicité aiguë ; Hépatotoxicité ; Cardiotoxicité (QT, hERG) ; Néphrotoxicité ; Neurotoxicité ; Génotoxicité ; Cancérogénicité ; Reprotoxicité ; Alertes structurales ; Organes cibles et signaux de toxicité. Pour "Alertes structurales", chaque assertion nomme le fragment et ce qui le porte.`
+};
+
+/* ---------------- analyse ---------------- */
+const ORDER = ["chim", "pk", "met", "tox"];
+const STEPS = { chim: "Chimie", pk: "Pharmacocinétique", met: "Métabolisme", tox: "Toxicologie" };
+const COUNTS = { chim: "9 paramètres", pk: "10 paramètres", met: "5 paramètres", tox: "10 paramètres" };
+const ICONS = {
+  chim: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 18.4 7v7.6L12 18.4 5.6 14.6V7z"/><circle cx="12" cy="3.2" r="1.3"/><circle cx="18.4" cy="14.6" r="1.3"/><circle cx="5.6" cy="7" r="1.3"/><path d="M9 9.4h6M9 12h6"/></svg>',
+  pk: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 19.5V4.2M3.5 19.5H21"/><path d="M4.5 17.6c2.4-.2 3.6-8.4 6-8.4 2.6 0 3.4 6.6 9.4 2.3"/><circle cx="10.5" cy="9.4" r="1.2"/></svg>',
+  met: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.6" cy="7" r="2.4"/><circle cx="18.4" cy="17" r="2.4"/><path d="M8.4 7.8c3.4.6 4.4 3 2.6 5.2M13.6 16.2c-3.4-.6-4.4-3-2.6-5.2"/><path d="M15.8 16.2l-2.2 0 0-2.2M8.2 7.8l2.2 0 0 2.2"/></svg>',
+  tox: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6 21 19.4H3z"/><path d="M12 9.2v5"/><circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"/></svg>'
+};
+const PENDING = '<div class="pending"><i></i><span>Analyse en cours…</span></div>';
+const ERR = {
+  pas_de_claude: "L'analyse n'a pas pu démarrer : aucun moteur n'est joignable. Si tu utilises la version hébergée, c'est que l'adresse du serveur n'est pas renseignée dans config.js.",
+  serveur_injoignable: "Le serveur d'analyse ne répond pas. Vérifie ta connexion, puis relance l'étape.",
+  serveur: "Le serveur d'analyse a renvoyé une erreur. Relance l'étape ; si ça persiste, préviens Valeria.",
+  config: "Le serveur d'analyse n'a pas de clé d'API configurée. Rien à faire de ton côté : préviens Valeria.",
+  code_classe: "Code de classe absent ou incorrect. Ouvre le lien complet qu'on t'a envoyé (celui qui finit par ?code=…).",
+  requete: "La demande a été refusée par le serveur. Relance l'étape.",
+  trop_long: "La demande envoyée est trop longue. Raccourcis le contexte clinique, puis relance.",
+  cle_refusee: "La clé d'API du serveur est refusée (expirée, ou plus de crédit). Préviens Valeria.",
+  trop_de_demandes: "Trop de demandes d'affilée sur le serveur. Attends une minute, puis relance l'étape.",
+  api: "L'API de Claude a renvoyé une erreur. Relance l'étape dans un moment.",
+  timeout: "Cette étape n'a rien renvoyé au bout de cinq minutes. Si tu viens d'ouvrir la page, vérifie que tu es bien connecté à claude.ai, puis relance l'étape.",
+  not_granted: "Cette page n'a pas l'autorisation d'utiliser Claude sur ce compte. Recharge et accepte la demande ; si aucune demande ne s'affiche, c'est que le compte qui ouvre la page n'y a pas droit.",
+  sampling_disabled: "Claude n'est pas disponible pour ce compte. Un compte gratuit n'y donne pas toujours accès.",
+  rate_limited: "Limite d'usage atteinte sur ce compte, ou trop de demandes d'affilée. Attends un moment, puis relance cette étape.",
+  invalid_json: "La réponse de cette étape est arrivée dans un format illisible. Relance l'étape.",
+  refused: "Claude a refusé cette demande.",
+  session_expired: "Ta session a expiré : reconnecte-toi à Claude."
+};
+
+/* ---------------- moteur d'analyse ---------------- */
+/* Deux façons d'interroger Claude :
+   - via le petit serveur de MolécuLab (adresse dans config.js), qui détient la
+     clé d'API : n'importe qui peut alors utiliser le site, sans compte ;
+   - à défaut, sur le compte Claude de la personne qui ouvre la page (capacité
+     « sample »), ce qui ne marche que si la page est servie par claude.ai.
+   La clé d'API n'est JAMAIS dans cette page : elle vit côté serveur. */
+const API = (window.MOLECULAB_API || "").trim();
+let MODE = null;
+
+/* Mot de passe commun éventuel : on l'accepte dans l'adresse (…/?code=XXXX)
+   et on le retient ensuite dans le navigateur. */
+function codeClasse() {
+  const u = new URLSearchParams(location.search).get("code");
+  if (u) { try { localStorage.setItem("mlab.code", u); } catch (e) {} return u; }
+  try { return localStorage.getItem("mlab.code") || ""; } catch (e) { return ""; }
+}
+
+/* Claude répond en JSON, parfois entouré de texte ou de ```json : on isole l'objet. */
+function extraireJSON(t) {
+  const a = t.indexOf("{"), b = t.lastIndexOf("}");
+  if (a < 0 || b <= a) throw { code: "invalid_json" };
+  try { return JSON.parse(t.slice(a, b + 1)); } catch (e) { throw { code: "invalid_json" }; }
+}
+
+/* Le serveur renvoie la réponse morceau par morceau : rien n'expire pendant
+   que Claude réfléchit, même une à deux minutes. On recolle le texte. */
+async function serveurJSON(prompt) {
+  let r;
+  try {
+    r = await fetch(API, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-code-classe": codeClasse() },
+      body: JSON.stringify({ prompt, modele: (window.MOLECULAB_MODELE || "").trim() || undefined })
+    });
+  } catch (e) { throw { code: "serveur_injoignable" }; }
+  if (!r.ok || !r.body) {
+    let c = "serveur";
+    try { c = (await r.json())?.erreur || c; } catch (e) {}
+    throw { code: c };
+  }
+  const lec = r.body.getReader(), dec = new TextDecoder();
+  let tampon = "", texte = "";
+  for (;;) {
+    const { done, value } = await lec.read();
+    if (done) break;
+    tampon += dec.decode(value, { stream: true });
+    const lignes = tampon.split("\n");
+    tampon = lignes.pop();
+    for (const l of lignes) {
+      if (!l.startsWith("data:")) continue;
+      let ev; try { ev = JSON.parse(l.slice(5).trim()); } catch (e) { continue; }
+      if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta") texte += ev.delta.text;
+      if (ev.type === "error") throw { code: "serveur" };
+    }
+  }
+  return extraireJSON(texte);
+}
+
+let moteurP = null;
+/* Si personne ne répond, on ne laisse pas tourner indéfiniment :
+   on rend la main avec un message clair. */
+const limite = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r("__timeout__"), ms))]);
+function getMoteur() {
+  return moteurP ||= (async () => {
+    if (API) { MODE = "serveur"; return { json: serveurJSON }; }
+    if (!window.claude?.use) return null;
+    const s = await limite(window.claude.use("sample"), 15000)
+      .then(v => (v === "__timeout__" ? null : v)).catch(() => null);
+    if (!s) return null;
+    MODE = "compte";
+    return { json: p => s.json(p, { modelTier: "default" }) };
+  })();
+}
+let BUSY = false;
+
+$("#f").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (BUSY) return;
+  const dci = $("#dci").value.trim(), smiles = $("#smiles").value.trim();
+  $("#ferr").innerHTML = "";
+  if (!dci && !smiles && !MOLBLOCK) {
+    $("#smiles").focus();
+    $("#ferr").innerHTML = '<div class="box warn">Donne au moins une structure SMILES, un fichier MOL/SDF, ou un nom de molécule connue.</div>';
+    return;
+  }
+  const d = {
+    id: "d" + Date.now(), date: new Date().toISOString(),
+    dci, smiles, molblock: MOLBLOCK, molname: MOLNAME, tab: "chim",
+    calc: calcDesc(smiles), centres: ionCentres(smiles), pka: {},
+    ctx: { dose: $("#dose").value.trim(), unit: $("#unit").value, tau: $("#tau").value.trim(), voie: $("#voie").value, form: $("#form").value.trim(), duree: $("#duree").value.trim(), perf: $("#perf").value.trim() },
+    steps: { chim: "wait", pk: "wait", met: "wait", tox: "wait" }, errors: {}
+  };
+  DOS.unshift(d); CUR = d.id; save();
+  show("dossiers");
+  run(d, ORDER.slice());
+});
+
+async function run(d, keys) {
+  if (BUSY) return;
+  BUSY = true; $("#go").disabled = true;
+  keys.forEach(k => { d.steps[k] = "wait"; delete d.errors[k]; });
+  save(); renderDossiers();
+  const moteur = await getMoteur();
+  /* Claude injoignable : on le dit sur chaque étape et on rend la main tout de suite. */
+  if (!moteur) {
+    keys.forEach(k => { d.steps[k] = "fail"; d.errors[k] = ERR.pas_de_claude; });
+    BUSY = false; $("#go").disabled = false;
+    save(); renderDossiers();
+    return;
+  }
+  try {
+  for (const k of keys) {
+    d.steps[k] = "run"; delete d.errors[k];
+    if (d.id === CUR) d.tab = k;
+    save(); renderDossiers();
+    try {
+      const r = await limite(moteur.json(P[k](d)), 300000);
+      if (r === "__timeout__") throw { code: "timeout" };
+      if (!r || typeof r !== "object") throw { code: "invalid_json" };
+      Object.assign(d, r);
+      /* Si l'utilisateur n'a donné qu'un nom, le SMILES retrouvé à l'étape 1 permet
+         de calculer les descripteurs, qui servent alors aux étapes suivantes. */
+      if (!d.calc && d.identite?.smiles_canonique) {
+        d.calc = calcDesc(d.identite.smiles_canonique);
+        d.centres = ionCentres(d.identite.smiles_canonique);
+      }
+      d.steps[k] = "done";
+    } catch (err) {
+      d.steps[k] = "fail";
+      d.errors[k] = ERR[err?.code] || "Cette étape n'a pas abouti. Relance-la.";
+      if (["not_granted", "sampling_disabled", "rate_limited", "session_expired"].includes(err?.code)) {
+        keys.slice(keys.indexOf(k) + 1).forEach(n => { d.steps[n] = "fail"; d.errors[n] = d.errors[k]; });
+        save(); renderDossiers(); break;
+      }
+    }
+    save(); renderDossiers();
+  }
+  } finally {
+    /* Quoi qu'il arrive, l'écran repart d'un état lisible : plus de rond qui tourne sans fin. */
+    BUSY = false; $("#go").disabled = false;
+    keys.forEach(k => { if (d.steps[k] === "run" || d.steps[k] === "wait") { d.steps[k] = "fail"; d.errors[k] = d.errors[k] || "Étape interrompue. Relance-la."; } });
+    save(); renderDossiers();
+  }
+}
+
+/* ---------------- rendu ---------------- */
+function isDark() {
+  const t = document.documentElement.dataset.theme;
+  if (t) return t === "dark";
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches || false;
+}
+/* ---------------- calcul local des descripteurs (OpenChemLib, dans le navigateur) ---------------- */
+const num = (v, n) => Number(v).toLocaleString("fr-FR", { minimumFractionDigits: n, maximumFractionDigits: n });
+
+/* Dessin de la structure : SVG produit par OpenChemLib, recoloré pour le thème sombre. */
+let svgSeq = 0;
+function structSVG(smiles, size) {
+  if (!smiles || !window.OCL) return null;
+  try {
+    const m = OCL.Molecule.fromSmiles(smiles);
+    const s = size || 380;
+    let svg = m.toSVG(s, s, "mlab-s" + (++svgSeq), { autoCrop: true, autoCropMargin: 12, strokeWidth: 1.4, fontSize: s < 250 ? 13 : 15 });
+    if (isDark()) svg = svg
+      .replace(/rgb\(0,0,0\)/g, "rgb(228,237,238)")
+      .replace(/rgb\(48,80,248\)/g, "rgb(138,180,242)")
+      .replace(/rgb\(255,13,13\)/g, "rgb(240,138,134)");
+    return svg;
+  } catch (e) { return null; }
+}
+
+/* Descripteurs réellement calculés sur le graphe moléculaire, jamais devinés. */
+function calcDesc(smiles) {
+  if (!smiles || !window.OCL) return null;
+  try {
+    const m = OCL.Molecule.fromSmiles(smiles);
+    const f = m.getMolecularFormula(), p = new OCL.MoleculeProperties(m), rs = m.getRingSet();
+    let arom = 0;
+    for (let i = 0; i < rs.getSize(); i++) if (rs.isAromatic(i)) arom++;
+    let q = 0;
+    for (let i = 0; i < m.getAllAtoms(); i++) q += m.getAtomCharge(i);
+    const mw = f.relativeWeight, logP = p.logP, logS = p.logS, tpsa = p.polarSurfaceArea;
+    const lip = [];
+    if (mw > 500) lip.push("masse > 500");
+    if (logP > 5) lip.push("logP > 5");
+    if (p.donorCount > 5) lip.push("donneurs H > 5");
+    if (p.acceptorCount > 10) lip.push("accepteurs H > 10");
+    const veb = [];
+    if (p.rotatableBondCount > 10) veb.push("liaisons rotables > 10");
+    if (tpsa > 140) veb.push("TPSA > 140");
+    return {
+      smiles: m.toSmiles(), formule: f.formula, mw, exact: f.absoluteWeight,
+      heavy: m.getAllAtoms(), cycles: rs.getSize(), arom,
+      logP, logS, solubilite: Math.pow(10, logS) * mw * 1000,
+      tpsa, hbd: p.donorCount, hba: p.acceptorCount,
+      rot: p.rotatableBondCount, stereo: p.stereoCenterCount, charge: q,
+      lipinski: lip, veber: veb
+    };
+  } catch (e) { return null; }
+}
+
+const CALC_ROWS = [
+  ["Formule brute", c => c.formule],
+  ["Masse molaire", c => num(c.mw, 2) + " g/mol"],
+  ["Masse exacte", c => num(c.exact, 4) + " Da"],
+  ["Atomes lourds", c => String(c.heavy)],
+  ["Cycles", c => `${c.cycles} dont ${c.arom} aromatique${c.arom > 1 ? "s" : ""}`],
+  ["cLogP", c => num(c.logP, 2)],
+  ["logS", c => `${num(c.logS, 2)} (≈ ${num(c.solubilite, 0)} mg/L)`],
+  ["TPSA", c => num(c.tpsa, 1) + " Å²"],
+  ["Donneurs / accepteurs H", c => `${c.hbd} / ${c.hba}`],
+  ["Liaisons rotables", c => String(c.rot)],
+  ["Centres stéréogènes", c => String(c.stereo)],
+  ["Charge formelle", c => (c.charge > 0 ? "+" : "") + c.charge]
+];
+
+function calcBlock(c) {
+  if (!c) return "";
+  return `<div class="calc">
+    <div class="calc-h"><span class="eyebrow">Descripteurs calculés</span><span class="hint">OpenChemLib, calculé dans ton navigateur sur la structure — ce ne sont pas des prédictions du modèle</span></div>
+    <div class="calc-g">${CALC_ROWS.map(([k, fn]) => {
+      let v; try { v = fn(c); } catch (e) { v = "—"; }
+      return `<div><div class="k">${k}</div><div class="v">${esc(v)}</div></div>`;
+    }).join("")}</div>
+    <div class="rules">
+      <span class="rule ${c.lipinski.length ? "no" : "ok"}">Lipinski : ${c.lipinski.length ? esc(c.lipinski.join(", ")) : "aucune violation"}</span>
+      <span class="rule ${c.veber.length ? "no" : "ok"}">Veber : ${c.veber.length ? esc(c.veber.join(", ")) : "respectée"}</span>
+    </div>
+  </div>`;
+}
+
+/* Les valeurs calculées sont données au moteur : il prédit à partir d'elles au lieu de les estimer. */
+function calcPrompt(c) {
+  if (!c) return "";
+  return "\n\nDESCRIPTEURS CALCULÉS sur cette structure par OpenChemLib, dans le navigateur. Ce sont des calculs, pas des estimations : reprends-les tels quels, ne les recalcule pas, et appuie tes raisonnements dessus.\n"
+    + CALC_ROWS.map(([k, fn]) => { try { return `- ${k} : ${fn(c)}`; } catch (e) { return null; } }).filter(Boolean).join("\n")
+    + `\n- Lipinski : ${c.lipinski.length ? c.lipinski.join(", ") : "aucune violation"}\n- Veber : ${c.veber.length ? c.veber.join(", ") : "respectée"}`
+    + "\nPour un paramètre de la liste ci-dessus, l'assertion porte source \"calcul OpenChemLib sur la structure\" et niveau \"C\". Si une valeur humaine mesurée existe et diffère, ajoute-la comme SECONDE assertion avec sa source et \"divergence\": true.";
+}
+
+/* ---------------- ionisation à pH 7,4 ---------------- */
+/* Les centres ionisables sont lus sur le graphe moléculaire. Le pKa affiché est la valeur
+   de référence de la classe reconnue, non corrigée des substituants : il est modifiable,
+   et tout ce qui en découle (ionisation, charge nette, logD) est alors recalculé. */
+const PH = 7.4;
+function ionCentres(smiles) {
+  if (!smiles || !window.OCL) return null;
+  let m;
+  try { m = OCL.Molecule.fromSmiles(smiles); } catch (e) { return null; }
+  const out = [], amid = [];
+  const an = i => m.getAtomicNo(i);
+  const arom = i => m.isAromaticAtom(i);
+  const conn = i => { const a = []; for (let k = 0; k < m.getConnAtoms(i); k++) a.push({ a: m.getConnAtom(i, k), o: m.getConnBondOrder(i, k) }); return a; };
+  const dblO = i => conn(i).filter(c => an(c.a) === 8 && c.o === 2).length;
+  const isCarbonyl = i => an(i) === 6 && dblO(i) > 0;
+  const isSulfonyl = i => an(i) === 16 && dblO(i) >= 2;
+  const ringOf = i => {
+    const rs = m.getRingSet();
+    for (let r = 0; r < rs.getSize(); r++) {
+      const at = [...rs.getRingAtoms(r)];
+      if (at.includes(i)) return { size: at.length, nN: at.filter(x => an(x) === 7).length };
+    }
+    return null;
+  };
+  for (let i = 0; i < m.getAllAtoms(); i++) {
+    const z = an(i), q = m.getAtomCharge(i), h = m.getAllHydrogens(i), cs = conn(i);
+    const heavy = cs.filter(c => an(c.a) !== 1);
+    if (z === 8 && q === 0 && h >= 1) {
+      const p = heavy[0]; if (!p) continue;
+      if (isSulfonyl(p.a)) out.push({ nom: "Acide sulfonique", type: "acide", pka: -1.5 });
+      else if (isCarbonyl(p.a)) out.push({ nom: "Acide carboxylique", type: "acide", pka: 4.2 });
+      else if (arom(p.a)) out.push({ nom: "Phénol", type: "acide", pka: 10.0 });
+      else out.push({ nom: "Alcool", type: "neutre", pka: 16 });
+    } else if (z === 16 && q === 0 && h >= 1) {
+      const p = heavy[0];
+      out.push(arom(p?.a) ? { nom: "Thiophénol", type: "acide", pka: 6.6 } : { nom: "Thiol", type: "acide", pka: 8.5 });
+    } else if (z === 7 && q === 1 && cs.length === 4) {
+      out.push({ nom: "Ammonium quaternaire", type: "permanent", pka: null });
+    } else if (z === 7 && q === 0 && !arom(i)) {
+      if (heavy.some(c => isSulfonyl(c.a))) { if (h >= 1) out.push({ nom: "Sulfonamide", type: "acide", pka: 10.0 }); continue; }
+      if (heavy.some(c => isCarbonyl(c.a))) continue;        // amide : non ionisable
+      if (heavy.some(c => an(c.a) === 7)) continue;          // hydrazine, nitro, azoture
+      const cAmid = heavy.find(c => an(c.a) === 6 && conn(c.a).some(x => an(x.a) === 7 && x.o === 2));
+      if (cAmid) { amid.push(cAmid.a); continue; }
+      if (heavy.some(c => an(c.a) === 6 && arom(c.a))) { out.push({ nom: "Aniline", type: "base", pka: 4.6 }); continue; }
+      const deg = heavy.length;
+      out.push(deg === 1 ? { nom: "Amine primaire", type: "base", pka: 10.6 }
+        : deg === 2 ? { nom: "Amine secondaire", type: "base", pka: 10.9 }
+        : { nom: "Amine tertiaire", type: "base", pka: 9.8 });
+    } else if (z === 7 && q === 0 && arom(i)) {
+      const r = ringOf(i); if (!r) continue;
+      if (r.size === 5 && r.nN === 4) { if (h >= 1) out.push({ nom: "Tétrazole", type: "acide", pka: 4.9 }); continue; }
+      if (h >= 1 || cs.length !== 2) continue;               // pyrrole, azote substitué : pas de doublet libre
+      if (r.size === 6) out.push({ nom: "Azote pyridinique", type: "base", pka: 5.2 });
+      else if (r.size === 5 && r.nN >= 2) out.push({ nom: "Azote de type imidazole", type: "base", pka: 7.0 });
+    }
+  }
+  /* Amidines et guanidines : le centre basique est le carbone, pas chacun de ses azotes ;
+     deux de ces carbones partageant un azote forment un biguanide, soit une seule base. */
+  const uniq = [...new Set(amid)], used = new Set();
+  for (const c of uniq) {
+    if (used.has(c)) continue;
+    const vN = conn(c).filter(x => an(x.a) === 7).map(x => x.a);
+    const pair = uniq.find(o => o !== c && !used.has(o) && conn(o).some(x => vN.includes(x.a)));
+    used.add(c);
+    if (pair) { used.add(pair); out.push({ nom: "Biguanide", type: "base", pka: 12.4 }); continue; }
+    out.push(vN.length >= 3 ? { nom: "Guanidine", type: "base", pka: 13.5 } : { nom: "Amidine", type: "base", pka: 11.5 });
+  }
+  return out.map((c, i) => ({ ...c, id: i }));
+}
+
+function ionState(centres, pkaUser, logP) {
+  if (!centres) return null;
+  let charge = 0, somme = 0;
+  const lignes = centres.map(c => {
+    const pka = pkaUser && pkaUser[c.id] != null ? Number(pkaUser[c.id]) : c.pka;
+    if (c.type === "permanent") { charge += 1; return { ...c, pka, frac: 1, txt: "charge permanente, quel que soit le pH" }; }
+    if (c.type === "neutre" || pka == null || !isFinite(pka)) return { ...c, pka, frac: 0, txt: "non ionisé à pH 7,4" };
+    if (c.type === "acide") {
+      const f = 1 / (1 + Math.pow(10, pka - PH));
+      charge -= f; somme += Math.pow(10, PH - pka);
+      return { ...c, pka, frac: f, txt: `${num(f * 100, f > 0.999 || f < 0.01 ? 2 : 1)} % sous forme ionisée A⁻` };
+    }
+    const f = 1 / (1 + Math.pow(10, PH - pka));
+    charge += f; somme += Math.pow(10, pka - PH);
+    return { ...c, pka, frac: f, txt: `${num(f * 100, f > 0.999 || f < 0.01 ? 2 : 1)} % sous forme protonée BH⁺` };
+  });
+  return { lignes, charge, logD: logP == null ? null : logP - Math.log10(1 + somme) };
+}
+
+function ionBlock(d) {
+  const st = ionState(d.centres, d.pka, d.calc?.logP);
+  if (!st) return "";
+  if (!st.lignes.length) return `<div class="calc"><div class="calc-h"><span class="eyebrow">Ionisation à pH 7,4</span></div>
+    <p class="hint" style="margin:0">Aucun centre ionisable reconnu sur la structure : la molécule reste neutre à pH 7,4, et logD = logP.</p></div>`;
+  const q = st.charge;
+  const etat = q > 0.5 ? "cation" : q < -0.5 ? "anion" : Math.abs(q) < 0.1 ? "neutre" : "partiellement ionisée";
+  return `<div class="calc">
+    <div class="calc-h"><span class="eyebrow">Ionisation à pH 7,4</span><span class="hint">Henderson-Hasselbalch, calculé · pKa de classe modifiable</span></div>
+    <div class="ions">${st.lignes.map(l => `
+      <div class="ion">
+        <span class="nm">${esc(l.nom)}</span>
+        <span class="ty ${l.type}">${l.type}</span>
+        <label class="pk-in">pKa <input type="number" step="0.1" value="${l.pka ?? ""}" data-pka="${l.id}" ${l.type === "permanent" ? "disabled" : ""}></label>
+        <span class="fr">${esc(l.txt)}</span>
+        <span class="bar" aria-hidden="true"><i style="width:${(l.frac * 100).toFixed(1)}%"></i></span>
+      </div>`).join("")}</div>
+    <div class="calc-g" style="margin-top:12px">
+      <div><div class="k">Charge nette à pH 7,4</div><div class="v">${(q > 0 ? "+" : "") + num(q, 2)} · ${etat}</div></div>
+      ${st.logD != null ? `<div><div class="k">logD 7,4 (calculé du logP)</div><div class="v">${num(st.logD, 2)}</div></div>` : ""}
+      ${st.logD != null ? `<div><div class="k">Écart logP − logD</div><div class="v">${num(d.calc.logP - st.logD, 2)}</div></div>` : ""}
+    </div>
+    <p class="hint" style="margin:10px 0 0">Le pKa proposé est celui de la classe reconnue, pas de ta molécule : un substituant voisin le déplace facilement d'une à deux unités. Corrige-le si tu as la vraie valeur, le reste se recalcule.</p>
+  </div>`;
+}
+
+function ionPrompt(d) {
+  const st = ionState(d.centres, d.pka, d.calc?.logP);
+  if (!st || !st.lignes.length) return "";
+  return "\n\nCENTRES IONISABLES lus sur la structure (détection exacte ; le pKa est celui de la classe, à affiner par toi si tu connais la valeur réelle de cette molécule) :\n"
+    + st.lignes.map(l => `- ${l.nom} (${l.type}), pKa de classe ${l.pka}, soit ${l.txt}`).join("\n")
+    + `\n- Charge nette calculée à pH 7,4 : ${num(st.charge, 2)}${st.logD != null ? ` ; logD 7,4 calculé : ${num(st.logD, 2)}` : ""}`
+    + "\nAppuie l'absorption, le volume de distribution et la liaison aux protéines sur cet état d'ionisation. Si le pKa réel de cette molécule diffère du pKa de classe, donne-le avec sa source et dis en quoi l'ionisation change.";
+}
+
+/* ---------------- simulateur concentration-temps ---------------- */
+/* Modèle à un compartiment, cinétique d'ordre 1, superposition des doses. */
+function simDefaults(d) {
+  const iv = /IV|intraveineuse/i.test(d.ctx?.voie || "");
+  let dose = parseFloat(String(d.ctx?.dose || "").replace(",", ".")) || 500;
+  const u = d.ctx?.unit || "mg";
+  if (u === "g") dose *= 1000; else if (u === "µg") dose /= 1000;
+  else if (u === "mg/kg") dose *= 70; else if (u === "µg/kg") dose = dose * 70 / 1000;
+  const tau = parseFloat(String(d.ctx?.tau || "").replace(",", ".").match(/[\d.]+/)?.[0]) || 8;
+  return { dose: Math.round(dose * 100) / 100, F: iv ? 1 : 0.8, CL: 10, Vd: 70, ka: iv ? 0 : 1.2, tau, n: 5, iv };
+}
+function simConc(p, t) {
+  const k = p.CL / p.Vd;
+  let c = 0;
+  for (let i = 0; i < p.n; i++) {
+    const dt = t - i * p.tau;
+    if (dt < 0) continue;
+    if (p.iv || !p.ka) c += (p.F * p.dose / p.Vd) * Math.exp(-k * dt);
+    else if (Math.abs(p.ka - k) < 1e-6) c += (p.F * p.dose / p.Vd) * k * dt * Math.exp(-k * dt);
+    else c += (p.F * p.dose * p.ka) / (p.Vd * (p.ka - k)) * (Math.exp(-k * dt) - Math.exp(-p.ka * dt));
+  }
+  return c;
+}
+function simCurve(p) {
+  const k = p.CL / p.Vd, demi = Math.LN2 / k;
+  const fin = p.n > 1 ? (p.n - 1) * p.tau + Math.min(4 * demi, 5 * p.tau) : Math.min(6 * demi, 48);
+  const N = 320, pts = [];
+  for (let i = 0; i <= N; i++) { const t = fin * i / N; pts.push([t, simConc(p, t)]); }
+  const tmax = p.iv || !p.ka ? 0 : Math.log(p.ka / k) / (p.ka - k);
+  return {
+    pts, fin, demi, tmax,
+    cmax1: simConc(p, p.iv || !p.ka ? 0 : tmax),
+    cssMoy: p.n > 1 ? p.F * p.dose / (p.CL * p.tau) : null,
+    accu: p.n > 1 ? 1 / (1 - Math.exp(-k * p.tau)) : null,
+    auc: p.F * p.dose / p.CL
+  };
+}
+function simSVG(p) {
+  const c = simCurve(p);
+  const W = 720, H = 300, L = 52, R = 14, T = 16, B = 34;
+  const maxY = Math.max(...c.pts.map(q => q[1])) * 1.12 || 1;
+  const x = t => L + (W - L - R) * t / c.fin;
+  const y = v => H - B - (H - T - B) * v / maxY;
+  const ticksX = 6, ticksY = 4;
+  const gx = [], gy = [];
+  for (let i = 0; i <= ticksX; i++) { const t = c.fin * i / ticksX; gx.push(`<line x1="${x(t).toFixed(1)}" y1="${T}" x2="${x(t).toFixed(1)}" y2="${H - B}" class="grid"/><text x="${x(t).toFixed(1)}" y="${H - B + 18}" class="ax" text-anchor="middle">${num(t, t > 20 ? 0 : 1)}</text>`); }
+  for (let i = 0; i <= ticksY; i++) { const v = maxY * i / ticksY; gy.push(`<line x1="${L}" y1="${y(v).toFixed(1)}" x2="${W - R}" y2="${y(v).toFixed(1)}" class="grid"/><text x="${L - 8}" y="${(y(v) + 4).toFixed(1)}" class="ax" text-anchor="end">${num(v, maxY < 2 ? 2 : 1)}</text>`); }
+  const path = c.pts.map((q, i) => `${i ? "L" : "M"}${x(q[0]).toFixed(1)},${y(q[1]).toFixed(1)}`).join(" ");
+  const aire = `${path} L${x(c.fin).toFixed(1)},${(H - B).toFixed(1)} L${L},${(H - B).toFixed(1)} Z`;
+  const css = c.cssMoy != null && c.cssMoy < maxY
+    ? `<line x1="${L}" y1="${y(c.cssMoy).toFixed(1)}" x2="${W - R}" y2="${y(c.cssMoy).toFixed(1)}" class="css"/>
+       <text x="${W - R - 4}" y="${(y(c.cssMoy) - 6).toFixed(1)}" class="ax" text-anchor="end">Css moyenne ${num(c.cssMoy, 2)}</text>` : "";
+  return { c, svg: `<svg viewBox="0 0 ${W} ${H}" class="plot" role="img" aria-label="Concentration plasmatique au cours du temps">
+    ${gy.join("")}${gx.join("")}
+    <path d="${aire}" class="area"/><path d="${path}" class="line"/>${css}
+    <line x1="${L}" y1="${T}" x2="${L}" y2="${H - B}" class="axis"/><line x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}" class="axis"/>
+  </svg>` };
+}
+function simBlock(d) {
+  const p = d.sim || simDefaults(d);
+  const { c, svg } = simSVG(p);
+  const f = (lab, key, step, unit) => `<label class="sim-f"><span>${lab}</span><input type="number" step="${step}" value="${p[key]}" data-sim="${key}">${unit ? `<em>${unit}</em>` : ""}</label>`;
+  return `<div class="calc sim">
+    <div class="calc-h"><span class="eyebrow">Courbe concentration-temps</span><span class="hint">Un compartiment, ordre 1 · calcul pur, aucune prédiction</span></div>
+    <div class="sim-in">
+      ${f("Dose", "dose", "1", "mg")}${f("F", "F", "0.05", "")}${f("CL", "CL", "0.5", "L/h")}${f("Vd", "Vd", "1", "L")}
+      ${p.iv ? "" : f("ka", "ka", "0.1", "h⁻¹")}${f("Intervalle", "tau", "0.5", "h")}${f("Nombre de doses", "n", "1", "")}
+      <label class="sim-f"><span>Voie</span><select data-sim="iv"><option value="0" ${p.iv ? "" : "selected"}>orale</option><option value="1" ${p.iv ? "selected" : ""}>IV bolus</option></select></label>
+    </div>
+    <div class="plot-cap">Concentration plasmatique en mg/L (axe vertical) au cours du temps en heures (axe horizontal)</div>
+    ${svg}
+    <div class="calc-g" style="margin-top:10px">
+      <div><div class="k">Demi-vie</div><div class="v">${num(c.demi, 2)} h</div></div>
+      <div><div class="k">${p.iv ? "C₀" : "Cmax (1ʳᵉ dose)"}</div><div class="v">${num(c.cmax1, 2)} mg/L</div></div>
+      ${p.iv ? "" : `<div><div class="k">Tmax</div><div class="v">${num(c.tmax, 2)} h</div></div>`}
+      <div><div class="k">AUC par dose</div><div class="v">${num(c.auc, 1)} mg·h/L</div></div>
+      ${c.cssMoy != null ? `<div><div class="k">Css moyenne</div><div class="v">${num(c.cssMoy, 2)} mg/L</div></div>` : ""}
+      ${c.accu != null ? `<div><div class="k">Facteur d'accumulation</div><div class="v">${num(c.accu, 2)}</div></div>` : ""}
+    </div>
+    <p class="hint" style="margin:10px 0 0">Les valeurs de départ viennent du contexte saisi et de réglages par défaut : remplace F, CL et Vd par ceux de la fiche ci-dessous pour voir la vraie courbe de ta molécule. Poids retenu pour une dose en mg/kg : 70 kg.</p>
+  </div>`;
+}
+
+function asHTML(a) {
+  const n = ["A", "B", "C"].includes(a?.niveau) ? a.niveau : "C";
+  return `<div class="as"><span class="val">${esc(a.valeur)}</span><span class="chip ${n}" title="${n === "A" ? "valeur humaine mesurée" : n === "B" ? "valeur publiée" : "prédiction à partir de la structure"}">${n}</span>
+    <span class="src">${esc(a.source || "prédiction structurale")}</span>
+    ${a.divergence ? '<span class="flag">divergence</span>' : ""}
+    ${a.commentaire ? `<span class="note">${esc(a.commentaire)}</span>` : ""}</div>`;
+}
+function table(rows) {
+  if (!Array.isArray(rows) || !rows.length) return '<p class="none">Aucun paramètre renvoyé.</p>';
+  return `<div class="scroll"><table><tbody>${rows.map(r => `<tr><td class="p">${esc(r.parametre)}</td><td>${
+    (r.assertions || []).length ? r.assertions.map(asHTML).join("") : '<span class="none">Hors de portée d\'une prédiction fiable.</span>'}</td></tr>`).join("")}</tbody></table></div>`;
+}
+function demarche(txt) {
+  return txt ? `<div class="demarche"><div class="eyebrow">Démarche</div><p>${esc(txt)}</p></div>` : "";
+}
+function liste(title, arr) {
+  const a = (arr || []).filter(Boolean);
+  return a.length ? `<details style="margin-top:10px"><summary>${title}</summary><ul>${a.map(h => `<li>${esc(h)}</li>`).join("")}</ul></details>` : "";
+}
+
+function panel(d, k) {
+  const st = d.steps[k] || "wait";
+  /* Les descripteurs sont calculés sur place : ils s'affichent sans attendre le moteur. */
+  const head = k === "chim" ? calcBlock(d.calc) + ionBlock(d) : k === "pk" ? simBlock(d) : "";
+  if (st === "fail") return head + `<div class="box crit">${esc(d.errors[k] || "Cette étape n'a pas abouti.")}</div>
+    <div class="actions" style="margin-top:12px"><button class="ghost" type="button" data-retry="${k}">Relancer cette étape</button></div>`;
+  if (st !== "done") return head + PENDING;
+
+  if (k === "chim") {
+    const c = d.chimie || {};
+    return head + demarche(c.demarche) + table(c.parametres);
+  }
+  if (k === "pk") {
+    const p = d.pharmacocinetique || {}, c = ctx(d);
+    return head + `<div class="box warn" style="margin-top:14px">${d.ctx.dose
+      ? `Contexte pris en compte : <strong>${esc(c)}</strong>. Cmax, AUC et Css sont calculés, le calcul est posé sous chaque ligne.`
+      : `Aucune dose saisie : Cmax, AUC et Css sont donnés <strong>normalisés par la dose</strong>, puisque AUC = F·D/CL.`}</div>
+      ${demarche(p.demarche)}${table(p.parametres)}${liste("Hypothèses de calcul", p.hypotheses)}${liste("Données manquantes", p.lacunes)}`;
+  }
+  if (k === "met") {
+    const m = d.metabolisme || {};
+    return demarche(m.demarche) + table(m.parametres) + ((m.metabolites || []).length
+      ? `<div class="eyebrow" style="margin-top:18px">Molécule mère et métabolites prédits</div>
+         <div class="met mere"><div class="t"><strong>${esc(d.identite?.dci || d.dci || "Molécule mère")}</strong><span class="eyebrow">point de départ</span></div>
+           <div class="met-b"><div class="met-draw">${structSVG(d.calc?.smiles || d.smiles, 200) || '<div class="no">—</div>'}</div>
+           <div class="hint">Chaque métabolite ci-dessous se lit par rapport à cette structure : le commentaire dit quel site est transformé.</div></div></div>
+         <div class="mets">${m.metabolites.map(x => {
+          const n = ["A", "B", "C"].includes(x.niveau) ? x.niveau : "C";
+          const svg = structSVG(x.smiles, 200);
+          return `<div class="met"><div class="t"><strong>${esc(x.nom)}</strong><span class="eyebrow">Phase ${esc(x.phase ?? "?")}</span>
+            <span>${esc([x.reaction, x.enzyme, x.part].filter(Boolean).join(" · "))}</span>
+            ${x.activite && x.activite !== "inconnu" ? `<span class="${x.activite === "réactif" ? "flag" : "chip B"}">${esc(x.activite)}</span>` : ""}
+            <span class="chip ${n}">${n}</span><span class="src">${esc(x.source || "prédiction structurale")}</span></div>
+            <div class="met-b">
+              <div class="met-draw">${svg || '<div class="no">SMILES non dessinable</div>'}</div>
+              <div>${x.smiles ? `<div class="sm">${esc(x.smiles)}</div>` : ""}
+              ${x.commentaire ? `<div class="note" style="margin-top:6px">${esc(x.commentaire)}</div>` : ""}</div>
+            </div></div>`;
+        }).join("")}</div>`
+      : "");
+  }
+  const t = d.toxicologie || {};
+  return demarche(t.demarche) + table(t.parametres);
+}
+
+function renderDossiers() {
+  const list = $("#list"), out = $("#dos");
+  if (!DOS.length) {
+    list.innerHTML = "";
+    out.innerHTML = `<div class="card empty"><h2>Aucun dossier pour l'instant</h2><p>Chaque analyse lancée depuis « Nouvelle analyse » est rangée ici et reste dans ce navigateur.</p>
+      <button class="go" type="button" data-new>Nouvelle analyse</button></div>`;
+    $("[data-new]", out).addEventListener("click", () => show("analyse"));
+    return;
+  }
+  if (!DOS.find(x => x.id === CUR)) CUR = DOS[0].id;
+  list.innerHTML = `<div class="eyebrow" style="padding:0 2px 4px">${DOS.length} dossier${DOS.length > 1 ? "s" : ""}</div>` + DOS.map(x => `
+    <button class="item" type="button" data-id="${x.id}" aria-current="${x.id === CUR}">
+      <strong>${esc(x.identite?.dci || x.dci || x.smiles || "Molécule")}</strong>
+      <small>${esc(new Date(x.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" }))} · ${esc(x.identite?.classe || (Object.values(x.steps).includes("run") ? "en cours" : "—"))}</small>
+    </button>`).join("");
+  $$(".item", list).forEach(b => b.addEventListener("click", () => { CUR = b.dataset.id; renderDossiers(); }));
+
+  const d = DOS.find(x => x.id === CUR), id = d.identite || {}, c = ctx(d);
+  const tab = ORDER.includes(d.tab) ? d.tab : "chim";
+  const smi = id.smiles_canonique || d.smiles || "";
+
+  out.innerHTML = `
+  <div class="card">
+    <div class="garde">
+      <div class="struct" id="struct"></div>
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <div class="top" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+          <div>
+            <div class="eyebrow">Identité ${id.statut === "hypothétique" ? "· molécule hypothétique" : id.statut === "connue" ? "· molécule documentée" : ""}</div>
+            <h2 style="font-family:var(--f-display);font-size:34px;font-weight:600;margin:2px 0 0;letter-spacing:-.01em">${esc(id.dci || d.dci || "Molécule")}</h2>
+          </div>
+          <div class="actions">
+            <button class="ghost" type="button" id="redo">Relancer l'analyse</button>
+            <button class="ghost" type="button" id="copyjson">Copier le dossier</button>
+            <button class="ghost danger" type="button" id="del">Supprimer</button>
+          </div>
+        </div>
+        ${id.classe || id.indication ? `<p style="margin:0;color:var(--ink-2)">${esc([id.classe, id.indication].filter(Boolean).join(" · "))}</p>` : ""}
+        <div class="meta">
+          <div><div class="k">SMILES</div><div class="v">${esc(smi || "—")}</div></div>
+          <div><div class="k">Formule</div><div class="v">${esc(id.formule || "—")}</div></div>
+          <div><div class="k">Masse molaire</div><div class="v">${esc(id.masse_molaire || "—")}</div></div>
+          <div><div class="k">CAS</div><div class="v">${esc(id.cas || "—")}</div></div>
+        </div>
+        ${c ? `<div class="hint">Contexte saisi : ${esc(c)}</div>` : ""}
+        <ol class="pipe">${ORDER.map(k => `<li data-s="${d.steps[k]}">${STEPS[k]}</li>`).join("")}</ol>
+        <span class="hint" id="copyok" hidden>Dossier copié dans le presse-papiers.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tiles">${ORDER.map(k => `
+    <button class="tile" type="button" data-tab="${k}" data-s="${d.steps[k]}" aria-current="${k === tab}">
+      ${ICONS[k]}<b>${STEPS[k]}</b>
+      <small>${d.steps[k] === "done" ? COUNTS[k] : d.steps[k] === "run" ? "en cours" : d.steps[k] === "fail" ? "à relancer" : "en attente"}</small>
+    </button>`).join("")}</div>
+
+  <div class="card">
+    <div class="sec-h"><h3>${STEPS[tab]}</h3><span class="eyebrow">Étape ${ORDER.indexOf(tab) + 1} sur 4 · ${COUNTS[tab]}</span></div>
+    <div class="sec-b">${panel(d, tab)}</div>
+  </div>
+
+  <p class="hint">Niveau A : valeur humaine mesurée · B : valeur publiée · C : prédiction à partir de la structure. La colonne de droite nomme la source ou la règle employée : c'est par là que se vérifie une valeur.</p>`;
+
+  const svg = structSVG(smi);
+  $("#struct", out).innerHTML = svg || `<div class="no">${smi
+    ? "SMILES non reconnu : la structure n'a pas pu être dessinée.<br><span class=\"mono\" style=\"word-break:break-all\">" + esc(smi) + "</span>"
+    : "Aucun SMILES. Donne une structure pour voir le dessin et les descripteurs calculés."}</div>`;
+
+  $$("[data-tab]", out).forEach(b => b.addEventListener("click", () => { d.tab = b.dataset.tab; save(); renderDossiers(); }));
+  /* pKa corrigé à la main : ionisation, charge et logD se recalculent tout de suite. */
+  $$("[data-pka]", out).forEach(inp => inp.addEventListener("change", () => {
+    d.pka = d.pka || {};
+    const v = parseFloat(inp.value);
+    d.pka[inp.dataset.pka] = isFinite(v) ? v : null;
+    save(); renderDossiers();
+  }));
+  $$("[data-sim]", out).forEach(inp => inp.addEventListener("change", () => {
+    const p = d.sim || simDefaults(d), key = inp.dataset.sim;
+    if (key === "iv") { p.iv = inp.value === "1"; if (p.iv) p.F = 1; }
+    else { const v = parseFloat(String(inp.value).replace(",", ".")); if (isFinite(v) && v > 0) p[key] = key === "n" ? Math.max(1, Math.round(v)) : v; }
+    d.sim = p; save(); renderDossiers();
+  }));
+  $$("[data-retry]", out).forEach(b => b.addEventListener("click", () => run(d, [b.dataset.retry])));
+  $("#redo").addEventListener("click", () => run(d, ORDER.slice()));
+  $("#del").addEventListener("click", e => {
+    const b = e.currentTarget;
+    if (b.dataset.armed) { DOS = DOS.filter(x => x.id !== d.id); CUR = DOS[0]?.id || null; save(); renderDossiers(); }
+    else { b.dataset.armed = "1"; b.textContent = "Confirmer la suppression"; setTimeout(() => { if (b.isConnected) { delete b.dataset.armed; b.textContent = "Supprimer"; } }, 4000); }
+  });
+  $("#copyjson").addEventListener("click", async () => {
+    const { molblock, ...rest } = d;
+    try { await navigator.clipboard.writeText(JSON.stringify(rest, null, 2)); $("#copyok").hidden = false; setTimeout(() => { const k = $("#copyok"); if (k) k.hidden = true; }, 2000); } catch (e) {}
+  });
+}
+
+/* Dossiers d'une version précédente : la chimie et la PK y étaient des tableaux, et
+   métabolisme et toxicologie une seule étape. On les remet au format courant. */
+DOS.forEach(x => {
+  if (Array.isArray(x.chimie)) x.chimie = { parametres: x.chimie };
+  if (Array.isArray(x.pharmacocinetique)) x.pharmacocinetique = { parametres: x.pharmacocinetique, hypotheses: x.hypotheses, lacunes: x.lacunes };
+  const s = x.steps || {};
+  if ("mettox" in s) { x.steps = { chim: s.chim || "fail", pk: s.pk || "fail", met: s.mettox || "fail", tox: s.mettox || "fail" }; }
+  if (x.metabolisme && x.metabolisme.resume && !x.metabolisme.demarche) x.metabolisme.demarche = x.metabolisme.resume;
+  if (x.toxicologie && x.toxicologie.resume && !x.toxicologie.demarche) x.toxicologie.demarche = x.toxicologie.resume;
+});
+
+/* reprise après rechargement : une étape restée « en cours » est marquée à relancer */
+DOS.forEach(x => Object.keys(x.steps || {}).forEach(k => { if (x.steps[k] === "run" || x.steps[k] === "wait") { x.steps[k] = "fail"; x.errors = x.errors || {}; x.errors[k] = "Analyse interrompue (page fermée ou rechargée)."; } }));
+save();
+show(location.hash.slice(1) || "analyse");
+/* Prévenir tout de suite si Claude n'est pas joignable, au lieu de laisser tourner une analyse. */
+getMoteur().then(s => {
+  if (!s) $("#ferr").innerHTML = `<div class="box warn">${ERR.pas_de_claude} Les descripteurs calculés, le dessin et le simulateur, eux, fonctionnent quand même.</div>`;
+});
+</script>
 </body>
 </html>

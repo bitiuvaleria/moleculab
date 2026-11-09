@@ -1,82 +1,92 @@
 # MolécuLab
 
-Application web d'analyse d'une molécule à partir de sa **DCI** ou de son **SMILES** : chimie,
-métabolisation, toxicologie et pharmacocinétique, chaque valeur affichée avec sa source nommée et
-son niveau de preuve. Projet d'UEL.
+Appli web qui part d'une structure chimique (SMILES, fichier MOL/SDF, ou nom de
+molécule) et en déduit un dossier en quatre étapes enchaînées :
 
-Outil pédagogique. Une valeur de niveau C est une prédiction : elle n'a pas de valeur clinique.
+1. **Chimie** — identité, descripteurs, ionisation à pH 7,4
+2. **Pharmacocinétique** — absorption, distribution, élimination, simulateur de courbe
+3. **Métabolisme** — voies probables, métabolites dessinés
+4. **Toxicologie** — alertes structurales, organes cibles
 
-## Ce que fait l'application
+Chaque étape reçoit les résultats des précédentes. Une molécule qui n'existe pas
+est acceptée : tout est prédit à partir de la structure.
 
-Le cheminement est imposé et visible pendant l'analyse :
+## Ce qui est calculé et ce qui est prédit
 
-1. identité et SMILES canonique ;
-2. chimie à partir de la structure (fonctions chimiques, masse molaire, pKa, lipophilie, solubilité) ;
-3. métabolites de phase I et II déduits de la structure ;
-4. toxicité de la molécule mère **et de chaque métabolite majeur**, à partir des éléments
-   structuraux porteurs de risque ;
-5. pharmacocinétique.
+Calculé dans le navigateur par [OpenChemLib](https://github.com/cheminfo/openchemlib-js)
+8.14.0 (donc vérifiable et reproductible) : formule, masses, logP, logS, TPSA,
+donneurs/accepteurs de liaisons H, liaisons rotatives, règles de Lipinski et de
+Veber, centres ionisables, ionisation et logD à pH 7,4, dessin des structures,
+courbe concentration-temps.
 
-Trois principes d'affichage :
+Prédit par le modèle : tout le reste. Chaque valeur porte un niveau de preuve
+(A : mesurée chez l'humain · B : publiée · C : prédite à partir de la structure)
+et la source ou la règle employée.
 
-- **Une rubrique, plusieurs sources.** Un paramètre n'est pas une valeur mais une liste
-  d'assertions. Deux sources qui divergent restent toutes deux affichées, avec un drapeau.
-- **Niveau de preuve sur chaque ligne.** A = valeur humaine mesurée (RCP, base publique des
-  médicaments), B = publication, C = prédiction ou calcul structural.
-- **Pas de dose en entrée.** Cmax, AUC et Css sont donnés normalisés par la dose, puisque
-  AUC = F·D/CL. Tmax, qui ne dépend que de ka et ke, reste calculable.
+## Architecture
 
-## Mise en route
+Un seul fichier d'appli, `index.html`, sans build ni dépendance à installer.
+Il interroge Claude de deux façons :
 
-Le site est statique : aucun serveur, aucune compilation.
+- **si `config.js` donne une adresse de serveur** (`window.MOLECULAB_API`), il
+  passe par ce serveur, qui détient la clé d'API. Les visiteurs n'ont alors
+  besoin de rien : ni compte, ni clé.
+- **sinon**, il utilise le compte Claude de la personne qui ouvre la page
+  (capacité `sample`), ce qui ne fonctionne que si la page est servie comme
+  artefact claude.ai.
 
-```bash
-# en local
-python3 -m http.server 8000     # puis http://localhost:8000
-```
+> La clé d'API n'est jamais dans la page. Un site statique est intégralement
+> lisible par ses visiteurs : une clé posée dans `config.js`, dans `index.html`
+> ou dans le dépôt serait publique, utilisable par n'importe qui, et facturée au
+> propriétaire du compte. C'est la seule raison d'être du serveur ci-dessous.
 
-Pour lancer une analyse, ouvrir l'onglet **Réglages** et coller une clé d'API Anthropic. Elle est
-conservée dans le stockage local du navigateur et envoyée uniquement à `api.anthropic.com`.
+## Déploiement
 
-> Une clé posée dans un navigateur convient à un usage personnel et à une démonstration. Pour un
-> site ouvert à d'autres, il faut un petit serveur qui garde la clé — voir « Étapes suivantes ».
+### 1. Le serveur qui garde la clé (Cloudflare Workers, offre gratuite)
 
-## Structure
+1. Créer un compte sur [dash.cloudflare.com](https://dash.cloudflare.com), puis
+   **Compute (Workers) → Create → Start from Hello World → Deploy**.
+2. **Edit code**, tout remplacer par le contenu de
+   [`worker/moleculab-worker.js`](worker/moleculab-worker.js), puis **Deploy**.
+3. **Settings → Variables and Secrets** :
 
-```
-index.html        la page unique, quatre onglets
-css/style.css     tokens de couleur, thème clair et sombre, composants
-js/app.js         saisie, appel du moteur, rendu des fiches, corrections
-```
+   | Nom | Type | Valeur |
+   |---|---|---|
+   | `ANTHROPIC_API_KEY` | Secret | la clé d'API, `sk-ant-…`, depuis [console.anthropic.com](https://console.anthropic.com) |
+   | `CODE_CLASSE` | Secret | un mot de passe commun, au choix. Vide = site ouvert à tous |
+   | `ORIGINE` | Text | l'adresse du site, par exemple `https://bitiuvaleria.github.io` |
+   | `MODELE` | Text | `claude-opus-5-5` (le plus fin) ou `claude-sonnet-5-5` (moins cher) |
 
-## Corrections
+4. Noter l'adresse du Worker : `https://…​.workers.dev`.
 
-Chaque ligne d'une fiche porte un lien *corriger*. Une correction enregistre la valeur juste, sa
-source et un commentaire ; elle est conservée dans le navigateur, elle prime sur toute prédiction, et
-elle est réinjectée dans le prompt à chaque nouvelle analyse de la même molécule. L'onglet
-Corrections permet de les exporter et de les réimporter en JSON, pour les transporter d'un
-navigateur à l'autre.
+Le Worker ne fait rien d'autre que recevoir une demande du site, y ajouter la
+clé, et renvoyer la réponse de Claude au fur et à mesure qu'elle s'écrit. Il
+refuse les demandes sans le bon `CODE_CLASSE`, celles qui dépassent 60 000
+caractères, et n'accepte que trois modèles.
 
-## Moteurs de référence
+### 2. Le site (GitHub Pages)
 
-Les quatre moteurs retenus pour le projet n'acceptent pas d'être appelés depuis un autre site. Ils
-sont donc ouverts depuis l'application avec le SMILES copié, et leur résultat se recolle dans le
-champ « Importer un résultat d'outil », où il devient une source prioritaire.
+1. Mettre l'adresse du Worker dans `config.js` :
+   `window.MOLECULAB_API = "https://…​.workers.dev";`
+2. **Settings → Pages** du dépôt : Source *Deploy from a branch*, branche
+   `main`, dossier `/ (root)`, **Save**.
+3. Le site est servi sur `https://<utilisateur>.github.io/moleculab/`.
 
-| Outil | Rôle | Accès programmatique réel |
-|---|---|---|
-| [BioTransformer 3.0](https://bitbucket.org/wishartlab/biotransformer3.0jar/wiki/Usage) | métabolites, enzymes | exécutable Java en local, usage académique |
-| [GLORYx](https://nerdd.univie.ac.at/gloryx) / [GLORYxR](https://github.com/molinfo-vienna/GLORYxR) | métabolites, score de priorité | paquet Python libre, GPL-3.0 |
-| [ADMETlab 3.0](https://admetlab3.scbdd.com) | ADME, alertes | API officielle ([NAR 2024](https://academic.oup.com/nar/article/52/W1/W422/7642316)) |
-| [ProTox 3.0](https://tox.charite.de/protox3/) | toxicité d'organe, toxicophores | interface POST documentée, 250 requêtes/jour/IP |
-| [BDPM](https://base-donnees-publique.medicaments.gouv.fr/) | RCP français | fichiers publics téléchargeables |
+Si un `CODE_CLASSE` est configuré, partager le lien avec le code :
+`https://…/moleculab/?code=LECODE`. Le navigateur le retient ensuite.
 
-## Étapes suivantes
+## Coût
 
-1. **Un petit serveur** (FastAPI) qui garde la clé d'API, exécute RDKit, BioTransformer 3.0 et
-   GLORYxR, et appelle les API de ProTox 3.0 et d'ADMETlab 3.0 avec une mise en cache — le quota de
-   ProTox est de 250 requêtes par jour, et une molécule plus dix métabolites en consomment onze.
-2. **Déduplication des métabolites par InChIKey** calculé par RDKit côté serveur, plutôt que par
-   comparaison de structures décrite en langage naturel.
-3. **Bilan des corrections par outil** : quel prédicteur se trompe, dans quel sens, sur quelle classe
-   chimique. C'est ce qui transforme l'agrégateur en travail d'évaluation critique.
+Une analyse complète = quatre appels à l'API, soit de l'ordre de 4 000 à 5 000
+jetons d'entrée et quelques milliers en sortie par appel. Les tarifs par million
+de jetons sont sur [anthropic.com/pricing](https://www.anthropic.com/pricing) ;
+`claude-sonnet-5-5` coûte nettement moins que `claude-opus-5-5` pour un rendu
+très proche sur ce type de tâche. Un plafond mensuel se règle dans la console
+Anthropic (**Settings → Limits**), ce qui évite toute mauvaise surprise si le
+lien circule plus que prévu.
+
+## Avertissement
+
+Outil d'apprentissage et de recherche. Les valeurs de niveau C sont des
+prédictions, pas des données. Aucune décision clinique ne doit s'appuyer
+dessus.
