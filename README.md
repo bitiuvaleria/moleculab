@@ -44,10 +44,26 @@ Il interroge Claude de deux façons :
 
 ### 1. Le serveur qui garde la clé (Cloudflare Workers, offre gratuite)
 
+Le plus simple : laisser Cloudflare lire le code dans ce dépôt. Le fichier
+`wrangler.jsonc` à la racine lui dit quoi déployer.
+
+1. Créer un compte sur [dash.cloudflare.com](https://dash.cloudflare.com).
+2. **Compute (Workers) → Create → Import a repository**, autoriser GitHub,
+   choisir `bitiuvaleria/moleculab`, branche `main`, et déployer. Laisser les
+   commandes de build vides.
+3. Régler ensuite les variables (tableau ci-dessous), dans **Settings →
+   Variables and Secrets** du Worker. `ORIGINE` et `MODELE` sont déjà posés par
+   `wrangler.jsonc` ; seuls les deux secrets restent à ajouter.
+
+À chaque `git push` sur `main`, Cloudflare redéploie le serveur tout seul.
+
+#### Variante : coller le code à la main
+
 1. Créer un compte sur [dash.cloudflare.com](https://dash.cloudflare.com), puis
    **Compute (Workers) → Create → Start from Hello World → Deploy**.
-2. **Edit code**, tout remplacer par le contenu de
-   [`worker/moleculab-worker.js`](worker/moleculab-worker.js), puis **Deploy**.
+2. Ouvrir le Worker, bouton **Edit code** (en haut à droite), tout remplacer
+   par le contenu de [`worker/moleculab-worker.js`](worker/moleculab-worker.js),
+   puis **Deploy**.
 3. **Settings → Variables and Secrets** :
 
    | Nom | Type | Valeur |
