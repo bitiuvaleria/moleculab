@@ -1,0 +1,16 @@
+// Réglages du petit serveur MolécuLab, lus par Cloudflare.
+// Grâce à ce fichier, Cloudflare peut déployer le serveur directement depuis
+// ce dépôt : rien à copier-coller à la main.
+//
+// Les secrets (clé d'API, code de classe) ne sont PAS ici : ils se règlent
+// dans Cloudflare, après le déploiement. Ce fichier est public.
+{
+  "name": "moleculab",
+  "main": "worker/moleculab-worker.js",
+  "compatibility_date": "2026-11-01",
+  "observability": { "enabled": true },
+  "vars": {
+    "ORIGINE": "https://bitiuvaleria.github.io",
+    "MODELE": "claude-sonnet-5-5"
+  }
+}
