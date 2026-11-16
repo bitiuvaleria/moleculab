@@ -87,9 +87,13 @@ textarea{min-height:76px;resize:vertical}
 .inline select{width:auto;flex:0 0 auto}
 .ghost{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 13px;cursor:pointer;font-weight:500;white-space:nowrap}
 .ghost:hover{border-color:var(--accent);color:var(--accent)}
-.pk{background:var(--sunk);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:14px}
-.pk-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
-.pk-h strong{font-weight:600}
+.pk{background:var(--sunk);border-radius:8px;padding:16px}
+.pk>summary{display:flex;gap:4px 10px;flex-wrap:wrap;align-items:baseline;cursor:pointer;list-style:none}
+.pk>summary::-webkit-details-marker{display:none}
+.pk>summary::before{content:"▸";color:var(--accent)}
+.pk[open]>summary::before{content:"▾"}
+.pk[open]>summary{margin-bottom:14px}
+.pk>summary strong{font-weight:600}
 .pk input,.pk select{background:var(--surface)}
 .submit{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding-top:4px}
 .trace{display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--ink-2)}
@@ -230,6 +234,17 @@ td.p{width:28%;font-weight:600;min-width:130px}
 .val{font-variant-numeric:tabular-nums}
 .chip{font-family:var(--f-mono);font-size:11px;font-weight:500;border-radius:4px;padding:1px 6px}
 .chip.A{color:var(--A);background:var(--A-bg)} .chip.B{color:var(--B);background:var(--B-bg)} .chip.C{color:var(--C);background:var(--C-bg)}
+.chip.P{color:var(--B);background:var(--B-bg)} .chip.S{color:var(--C);background:var(--C-bg)}
+.refs{flex-basis:100%;font-size:12.5px;color:var(--ink-3);margin-top:5px}
+.refs b{display:block;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.refs ul{margin:3px 0 0;padding-left:16px}
+.refs li{margin:1.5px 0}
+.refs em{font-style:normal;color:var(--ink-3);font-size:11px}
+.refs.manque{color:var(--crit)}
+.outils{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:10px}
+.outils h4{margin:0 0 4px;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.outils ul{margin:0;padding-left:16px;font-size:13.5px}
+.outils li{margin:3px 0}
 .src{font-size:12.5px;color:var(--ink-2);font-style:italic}
 .flag{font-size:11px;font-weight:600;color:var(--crit);background:var(--crit-bg);border-radius:4px;padding:1px 6px}
 .note{flex-basis:100%;font-size:12.5px;color:var(--ink-3)}
@@ -307,8 +322,8 @@ details ul{margin:8px 0 0;padding-left:20px}
           </div>
         </div>
 
-        <div class="pk">
-          <div class="pk-h"><strong>Contexte pharmacocinétique</strong><span class="hint">Facultatif. Sans dose, Cmax, AUC et Css sont rendus normalisés par la dose.</span></div>
+        <details class="pk" id="pkdet">
+          <summary><strong>Contexte pharmacocinétique</strong><span class="hint">facultatif — dose, intervalle, voie. Sans dose, Cmax, AUC et Css sont rendus normalisés par la dose.</span></summary>
           <div class="grid3">
             <div class="field">
               <label for="dose">Dose par prise</label>
@@ -341,7 +356,7 @@ details ul{margin:8px 0 0;padding-left:20px}
               <input type="text" id="perf" placeholder="ex. 30 min, 1 mg/h">
             </div>
           </div>
-        </div>
+        </details>
 
         <div class="submit">
           <span class="trace">Descripteurs calculés sur la structure · prédictions raisonnées à partir d'eux</span>
@@ -397,12 +412,12 @@ details ul{margin:8px 0 0;padding-left:20px}
         <p>L'analyse part de la structure et raisonne. Pour une molécule connue, les valeurs humaines mesurées sont données en premier, parce qu'une mesure vaut mieux qu'une prédiction. Pour une molécule qui n'existe pas, tout est prédit : chaque ligne nomme alors la règle, le modèle ou l'analogie employés (règle de Lipinski, équation de Henderson-Hasselbalch, analogie avec une série connue, toxicophore reconnu), et la démarche est résumée en haut de chaque domaine.</p>
       </div>
       <div>
-        <div class="eyebrow">Niveau de preuve affiché sur chaque ligne</div>
+        <div class="eyebrow">Deux niveaux, affichés sur chaque ligne</div>
         <ul>
-          <li><span class="chip A">A</span> valeur humaine mesurée : RCP, base de données publique des médicaments, monographie.</li>
-          <li><span class="chip B">B</span> valeur publiée : article indexé dans PubMed, revue.</li>
-          <li><span class="chip C">C</span> prédiction in silico ou calcul à partir de la structure.</li>
+          <li><span class="chip P">publiée</span> valeur mesurée ou publiée : chaque ligne porte ses <strong>références</strong>. Un PMID ou un DOI ouvre directement l'article ; sans identifiant sûr, le lien ouvre une recherche PubMed sur la citation, parce qu'un identifiant inventé serait pire que pas d'identifiant.</li>
+          <li><span class="chip S">prédite</span> valeur déduite de la structure : chaque ligne montre la <strong>démarche suivie</strong>, deux à quatre étapes, de la plus déterminante à la moins. Les outils dont la méthode est reprise sont cliquables ; une règle (Lipinski, Henderson-Hasselbalch, analogie de série) est nommée en toutes lettres.</li>
         </ul>
+        <p>Une ligne annoncée comme publiée mais sans référence est signalée en rouge : c'est une valeur à ne pas reprendre telle quelle.</p>
       </div>
       <div>
         <div class="eyebrow">Traçabilité avant interprétation</div>
@@ -413,21 +428,15 @@ details ul{margin:8px 0 0;padding-left:20px}
         <p>F, CL, Vd, t½, liaison protéique et fraction libre ne dépendent pas de la dose. Cmax, AUC et Css en dépendent (AUC = F·D/CL ; Css,moy = F·D/(CL·τ)) : avec une dose, ils sont calculés et le calcul est posé ; sans dose, ils sont donnés normalisés par la dose.</p>
       </div>
       <div>
-        <div class="eyebrow">Outils dont la méthode est reprise, et où vérifier</div>
-        <ul>
-          <li><a href="https://base-donnees-publique.medicaments.gouv.fr/" target="_blank" rel="noopener">Base de données publique des médicaments</a> : RCP français.</li>
-          <li><a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener">PubMed</a> : valeurs humaines publiées.</li>
-          <li><a href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener">PubChem</a> : identité, descripteurs.</li>
-          <li><a href="https://admetlab3.scbdd.com" target="_blank" rel="noopener">ADMETlab 3.0</a> : descripteurs physico-chimiques et modèles ADME, dont les règles sont reprises à l'étape chimie et pharmacocinétique.</li>
-          <li><a href="https://biotransformer.ca/" target="_blank" rel="noopener">BioTransformer 3.0</a> et <a href="https://nerdd.univie.ac.at/gloryx" target="_blank" rel="noopener">GLORYx</a> : prédiction des métabolites par règles de biotransformation appliquées aux sites réactifs, méthode suivie à l'étape métabolisme.</li>
-          <li><a href="https://tox.charite.de/protox3/" target="_blank" rel="noopener">ProTox 3.0</a> : toxicité d'organe et toxicophores, dont la logique de fragments porteurs de risque est suivie à l'étape toxicologie.</li>
-        </ul>
+        <div class="eyebrow">Toutes les sources auxquelles l'analyse fait appel</div>
+        <p>Voici la liste complète. Le moteur ne peut citer que ces noms-là dans la démarche d'une valeur prédite, et c'est la page qui en fabrique les liens : aucune adresse n'est inventée au fil de l'analyse. Une démarche qui n'est pas un outil est écrite en toutes lettres.</p>
+        <div class="outils" id="outils"></div>
       </div>
       <div>
         <div class="eyebrow">Partager ce site</div>
         <p>Le lien peut être ouvert par n'importe qui, mais l'analyse ne tourne pas sur un serveur : elle utilise le compte Claude de la personne qui ouvre la page. Pour qu'une camarade puisse lancer une analyse, il lui faut donc être <strong>connectée à claude.ai dans le même navigateur</strong> (un compte gratuit suffit), puis accepter la demande d'autorisation qui s'affiche au premier lancement. Sans connexion, la page s'ouvre quand même : la structure se dessine, les descripteurs se calculent et le simulateur fonctionne, seule l'analyse par le moteur reste indisponible, et la page le dit au lieu de tourner dans le vide.</p>
       </div>
-      <div class="box warn">Outil d'apprentissage. Les valeurs sont produites par Claude à partir de ses connaissances, sans accès à internet pendant l'analyse : vérifie toute valeur importante dans la source citée. Une ligne de niveau C est une prédiction et ne sert à aucune décision thérapeutique.</div>
+      <div class="box warn">Outil d'apprentissage. Les valeurs sont produites par Claude à partir de ses connaissances, sans accès à internet pendant l'analyse : vérifie toute valeur importante dans la source citée. Une ligne « prédite » ne sert à aucune décision thérapeutique, et une référence citée se vérifie avant d'être reprise.</div>
     </div>
   </div>
 </section>
@@ -516,9 +525,76 @@ $("#ex").addEventListener("click", () => {
   $("#dose").value = "15"; $("#unit").value = "µg/kg"; $("#tau").value = "dose unique";
   $("#voie").value = "IV bolus"; $("#form").value = "solution injectable"; $("#duree").value = "anesthésie de courte durée"; $("#perf").value = "";
   smiCheck();
+  $("#pkdet").open = true;
   window.scrollTo({ top: $("#f").offsetTop - 70, behavior: "smooth" });
   $("#dci").focus({ preventScroll: true });
 });
+
+/* ---------------- catalogue des sources ---------------- */
+/* Une seule liste, utilisée à deux endroits : elle est donnée au moteur, qui ne
+   doit citer QUE ces noms, et elle remplit l'onglet « Sources & méthode ».
+   Les adresses sont écrites ici, dans la page : le moteur n'en fabrique aucune,
+   ce qui évite les liens inventés. Une démarche qui n'est pas un outil (règle de
+   Lipinski, Henderson-Hasselbalch, analogie) s'écrit en toutes lettres. */
+const OUTILS = {
+  "PubChem": { g: "Identité, structure et descripteurs", url: "https://pubchem.ncbi.nlm.nih.gov/", q: "identité, structure, descripteurs et données expérimentales rassemblées" },
+  "ChEMBL": { g: "Identité, structure et descripteurs", url: "https://www.ebi.ac.uk/chembl/", q: "molécules bioactives, cibles, données d'activité" },
+  "DrugBank": { g: "Identité, structure et descripteurs", url: "https://go.drugbank.com/", q: "fiches médicament : cibles, métabolisme, interactions" },
+  "OpenChemLib": { g: "Identité, structure et descripteurs", url: "https://github.com/cheminfo/openchemlib-js", q: "la bibliothèque qui calcule les descripteurs et dessine les structures, ici, dans ton navigateur" },
+
+  "Base de données publique des médicaments": { g: "Données humaines et réglementaires", url: "https://base-donnees-publique.medicaments.gouv.fr/", q: "RCP et notices français" },
+  "EMA — médicaments et EPAR": { g: "Données humaines et réglementaires", url: "https://www.ema.europa.eu/en/medicines", q: "rapports européens d'évaluation, dont la pharmacocinétique humaine" },
+  "Drugs@FDA": { g: "Données humaines et réglementaires", url: "https://www.accessdata.fda.gov/scripts/cder/daf/", q: "dossiers d'approbation américains et leurs études cliniques" },
+  "DailyMed": { g: "Données humaines et réglementaires", url: "https://dailymed.nlm.nih.gov/", q: "monographies américaines à jour" },
+  "PharmGKB": { g: "Données humaines et réglementaires", url: "https://www.pharmgkb.org/", q: "pharmacogénétique : variants, enzymes, conséquences cliniques" },
+
+  "PubMed": { g: "Littérature", url: "https://pubmed.ncbi.nlm.nih.gov/", q: "la littérature indexée — c'est là que s'ouvrent les références citées" },
+  "Europe PMC": { g: "Littérature", url: "https://europepmc.org/", q: "même littérature, avec plus de textes intégraux en accès libre" },
+
+  "ADMETlab 3.0": { g: "ADME et pharmacocinétique", url: "https://admetlab3.scbdd.com", q: "modèles ADMET : absorption, distribution, métabolisme, excrétion" },
+  "SwissADME": { g: "ADME et pharmacocinétique", url: "http://www.swissadme.ch/", q: "absorption orale, passage hémato-encéphalique (BOILED-Egg), règles de druglikeness" },
+  "pkCSM": { g: "ADME et pharmacocinétique", url: "https://biosig.lab.uq.edu.au/pkcsm/", q: "propriétés pharmacocinétiques prédites par signatures de graphe" },
+  "UCSF-FDA TransPortal": { g: "ADME et pharmacocinétique", url: "http://transportal.compbio.ucsf.edu/", q: "transporteurs membranaires, substrats et inhibiteurs" },
+
+  "BioTransformer 3.0": { g: "Métabolisme", url: "https://biotransformer.ca/", q: "métabolites prédits par règles de biotransformation" },
+  "GLORYx": { g: "Métabolisme", url: "https://nerdd.univie.ac.at/gloryx/", q: "métabolites de phase I et II, classés par vraisemblance" },
+  "SMARTCyp": { g: "Métabolisme", url: "https://smartcyp.sund.ku.dk/mol_to_som", q: "sites d'oxydation par les CYP450, position par position" },
+  "FAME 3": { g: "Métabolisme", url: "https://nerdd.univie.ac.at/fame3/", q: "sites de métabolisme, phase I et II" },
+
+  "ProTox 3.0": { g: "Toxicologie", url: "https://tox.charite.de/protox3/", q: "toxicité aiguë, toxicité d'organe, toxicophores" },
+  "CompTox Chemicals Dashboard": { g: "Toxicologie", url: "https://comptox.epa.gov/dashboard/", q: "données expérimentales et criblages ToxCast de l'EPA" },
+  "Comparative Toxicogenomics Database": { g: "Toxicologie", url: "https://ctdbase.org/", q: "liens établis entre substances, gènes et maladies" },
+  "ECHA — informations sur les substances": { g: "Toxicologie", url: "https://echa.europa.eu/information-on-chemicals", q: "dossiers réglementaires européens, toxicité réglementaire" },
+  "LiverTox": { g: "Toxicologie", url: "https://www.ncbi.nlm.nih.gov/books/NBK547852/", q: "hépatotoxicité médicamenteuse documentée cas par cas" },
+  "CredibleMeds": { g: "Toxicologie", url: "https://crediblemeds.org/", q: "médicaments allongeant le QT, par niveau de risque" }
+};
+const CLES_OUTILS = Object.keys(OUTILS);
+const GROUPES = Object.entries(CLES_OUTILS.reduce((o, k) => { (o[OUTILS[k].g] = o[OUTILS[k].g] || []).push(k); return o; }, {}));
+const sansAccent = x => String(x).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+const INDEX_OUTILS = new Map(CLES_OUTILS.map(k => [sansAccent(k), k]));
+/* On ne reconnaît un outil que sur son nom exact (accents et ponctuation mis à
+   part). Tout le reste s'affiche tel quel : c'est une règle, pas un site. */
+function lienOutil(nom) {
+  const t = String(nom || "").trim();
+  if (!t) return "";
+  const k = INDEX_OUTILS.get(sansAccent(t.split("(")[0]));
+  return k ? `<a href="${OUTILS[k].url}" target="_blank" rel="noopener">${esc(k)}</a>${t.includes("(") ? " " + esc(t.slice(t.indexOf("("))) : ""}` : esc(t);
+}
+/* Un PMID ou un DOI donne un lien direct. Sinon on ouvre une RECHERCHE sur la
+   citation : le lien marche toujours, et c'est à toi de juger ce qu'elle rend. */
+function lienRef(r) {
+  const t = String(r?.citation || r?.titre || "").trim();
+  const pmid = String(r?.pmid || "").replace(/\D/g, "");
+  const doi = String(r?.doi || "").trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, "");
+  const type = String(r?.type || "").toLowerCase();
+  const reglementaire = type === "rcp" || type === "base" || /\bRCP\b|résumé des caractéristiques|notice|EPAR|monographie/i.test(t);
+  let href, quoi;
+  if (pmid) { href = "https://pubmed.ncbi.nlm.nih.gov/" + pmid + "/"; quoi = "PMID " + pmid; }
+  else if (/^10\.\S+$/.test(doi)) { href = "https://doi.org/" + doi; quoi = "DOI " + doi; }
+  else if (reglementaire) { href = "https://base-donnees-publique.medicaments.gouv.fr/"; quoi = "à retrouver sur la base publique"; }
+  else { href = "https://pubmed.ncbi.nlm.nih.gov/?term=" + encodeURIComponent(t); quoi = "recherche PubMed"; }
+  return `<a href="${href}" target="_blank" rel="noopener">${esc(t || "référence")}</a> <em>${esc(quoi)}</em>`;
+}
 
 /* ---------------- prompts ---------------- */
 const CADRE = `Tu es le moteur de prédiction d'un outil pédagogique de pharmacie, utilisé par un docteur en pharmacie.
@@ -526,14 +602,22 @@ Tu raisonnes À PARTIR DE LA STRUCTURE. La molécule peut être connue, ou n'exi
 
 const REGLES = `RÈGLES
 - Tout en français. Les identifiants normalisés (CYP3A4, P-gp, hERG, CAS) restent tels quels.
-- Pour une molécule connue, donne d'abord la valeur humaine mesurée, avec sa source précise (ex. "RCP Rapifen, rubrique 5.2", "Bower S, Hull CJ. Br J Anaesth 1982, 54:871").
-- Pour une prédiction, "source" nomme LA MÉTHODE employée, jamais un site : la règle, le modèle, le fragment ou l'analogie (ex. "Henderson-Hasselbalch sur l'amine tertiaire", "règle de Lipinski", "analogie fentanyl/sufentanil", "toxicophore nitroaromatique", "Crippen cLogP par fragments").
-- "niveau" : "A" valeur humaine mesurée ; "B" valeur publiée ; "C" prédiction ou calcul à partir de la structure.
+- DEUX niveaux, pas davantage :
+  · "publie" : valeur mesurée ou publiée chez l'humain ou l'animal, lue dans la littérature, un RCP ou une base. Quand elle existe, elle passe devant la prédiction.
+  · "predit" : valeur déduite de la structure — règle, modèle, fragment, analogie, calcul.
+- Toute assertion "publie" porte "references" : 1 à 3 entrées. "citation" = auteurs abrégés, revue, année, volume et pages, OU l'intitulé exact du document réglementaire ("RCP Rapifen, rubrique 5.2"). "type" vaut "article", "rcp" ou "base". "pmid" et "doi" ne sont remplis QUE si tu en es certain : n'invente jamais un PMID, un DOI ou une adresse web, un identifiant faux étant pire qu'un identifiant absent. Laissé vide, l'outil fabrique lui-même une recherche à partir de la citation.
+- Toute assertion "predit" porte "methodes" : 2 à 4 entrées, la démarche réellement suivie, de la plus déterminante à la moins. Chaque entrée est soit le NOM EXACT d'un outil de la liste ci-dessous dont tu reprends la méthode, soit une règle nommée en toutes lettres ("règle de Lipinski", "Henderson-Hasselbalch sur l'amine tertiaire", "analogie fentanyl/sufentanil", "toxicophore nitroaromatique", "Crippen cLogP par fragments").
+- "source" reste une étiquette courte : en quelques mots, d'où sort la valeur.
 - "commentaire" dit COMMENT tu arrives à la valeur, en une phrase : le fragment lu sur la structure, le calcul posé, l'analogie choisie. C'est ce que l'utilisateur vérifie.
-- N'habille jamais une prédiction en mesure : une valeur non mesurée est de niveau "C". Si deux raisonnements ou deux sources crédibles divergent, donne DEUX assertions avec "divergence": true sur chacune. Un paramètre hors de portée reçoit "assertions": [].
+- N'habille jamais une prédiction en valeur publiée : une valeur non mesurée est "predit", même si elle est très plausible. Si deux raisonnements ou deux sources crédibles divergent, donne DEUX assertions avec "divergence": true sur chacune. Un paramètre hors de portée reçoit "assertions": [].
 - "demarche" résume en 2 à 4 phrases le raisonnement du domaine : ce que tu lis sur la structure, ce que tu en déduis, ce qui reste incertain.
-- Réponds UNIQUEMENT par le JSON demandé.`;
-const AS = `{"valeur":"","source":"","niveau":"A|B|C","commentaire":"","divergence":false}`;
+- Réponds UNIQUEMENT par le JSON demandé.
+
+OUTILS CITABLES dans "methodes" — reprends le nom à l'identique, sans rien y ajouter :
+${GROUPES.map(([g, l]) => `- ${g} : ${l.join(" ; ")}`).join("\n")}
+
+Tu n'as pas accès à internet pendant l'analyse : tu cites ces outils parce que tu en reprends la méthode ou que tu te souviens de leur contenu, jamais parce que tu viens de les consulter. Ne prétends pas avoir ouvert une page. Un outil absent de cette liste ne se cite pas : décris la démarche en toutes lettres à la place.`;
+const AS = `{"valeur":"","niveau":"publie|predit","source":"","references":[{"citation":"","type":"article|rcp|base","pmid":"","doi":""}],"methodes":[""],"commentaire":"","divergence":false}`;
 
 function mol(d) {
   return `STRUCTURE À ANALYSER\nSMILES = ${d.calc?.smiles || d.smiles || "(non fourni)"}\nNom ou nom de travail = ${d.dci || "(non fourni)"}`
@@ -614,7 +698,7 @@ ${REGLES}
 
 Renvoie exactement :
 {"metabolisme":{"demarche":"","parametres":[{"parametre":"","assertions":[${AS}]}],
-  "metabolites":[{"nom":"","smiles":"","reaction":"","enzyme":"","phase":1,"activite":"actif|inactif|réactif|inconnu","part":"","source":"","niveau":"A|B|C","commentaire":""}]}}
+  "metabolites":[{"nom":"","smiles":"","reaction":"","enzyme":"","phase":1,"activite":"actif|inactif|réactif|inconnu","part":"","source":"","niveau":"publie|predit","methodes":[""],"references":[],"commentaire":""}]}}
 
 "parametres" contient exactement ces 5 paramètres, dans cet ordre : Enzymes de phase I (CYP450 et autres) ; Conjugaisons de phase II ; Transporteurs (P-gp, OATP, BCRP…) ; Voies métaboliques majeures ; Métabolites actifs ou réactifs.
 "metabolites" : huit au maximum, les plus importants, du plus au moins probable. "smiles" est le SMILES du métabolite, obligatoire. "part" estime la part de la dose métabolisée par cette voie (ex. "voie majeure, ~60 %"). "commentaire" dit quel site de la structure est touché.`,
@@ -655,6 +739,7 @@ const ERR = {
   cle_refusee: "La clé d'API du serveur est refusée (expirée, ou plus de crédit). Préviens Valeria.",
   trop_de_demandes: "Trop de demandes d'affilée sur le serveur. Attends une minute, puis relance l'étape.",
   api: "L'API de Claude a renvoyé une erreur. Relance l'étape dans un moment.",
+
   timeout: "Cette étape n'a rien renvoyé au bout de cinq minutes. Si tu viens d'ouvrir la page, vérifie que tu es bien connecté à claude.ai, puis relance l'étape.",
   not_granted: "Cette page n'a pas l'autorisation d'utiliser Claude sur ce compte. Recharge et accepte la demande ; si aucune demande ne s'affiche, c'est que le compte qui ouvre la page n'y a pas droit.",
   sampling_disabled: "Claude n'est pas disponible pour ce compte. Un compte gratuit n'y donne pas toujours accès.",
@@ -665,17 +750,16 @@ const ERR = {
 };
 
 /* ---------------- moteur d'analyse ---------------- */
-/* Deux façons d'interroger Claude :
-   - via le petit serveur de MolécuLab (adresse dans config.js), qui détient la
-     clé d'API : n'importe qui peut alors utiliser le site, sans compte ;
-   - à défaut, sur le compte Claude de la personne qui ouvre la page (capacité
-     « sample »), ce qui ne marche que si la page est servie par claude.ai.
+/* Version hébergée : les questions partent vers le petit serveur de MolécuLab
+   (adresse dans config.js), qui détient la clé d'API. N'importe qui peut donc
+   utiliser le site, sans compte Claude. Si aucune adresse n'est renseignée, on
+   retombe sur le compte Claude du visiteur, comme dans l'artefact.
    La clé d'API n'est JAMAIS dans cette page : elle vit côté serveur. */
 const API = (window.MOLECULAB_API || "").trim();
 let MODE = null;
 
-/* Mot de passe commun éventuel : on l'accepte dans l'adresse (…/?code=XXXX)
-   et on le retient ensuite dans le navigateur. */
+/* Mot de passe commun éventuel : accepté dans l'adresse (…/?code=XXXX),
+   puis retenu dans le navigateur. */
 function codeClasse() {
   const u = new URLSearchParams(location.search).get("code");
   if (u) { try { localStorage.setItem("mlab.code", u); } catch (e) {} return u; }
@@ -689,8 +773,10 @@ function extraireJSON(t) {
   try { return JSON.parse(t.slice(a, b + 1)); } catch (e) { throw { code: "invalid_json" }; }
 }
 
-/* Le serveur renvoie la réponse morceau par morceau : rien n'expire pendant
-   que Claude réfléchit, même une à deux minutes. On recolle le texte. */
+const limite = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r("__timeout__"), ms))]);
+
+/* Le serveur renvoie la réponse morceau par morceau : rien n'expire pendant que
+   Claude réfléchit, même une à deux minutes. On recolle le texte au passage. */
 async function serveurJSON(prompt) {
   let r;
   try {
@@ -724,9 +810,6 @@ async function serveurJSON(prompt) {
 }
 
 let moteurP = null;
-/* Si personne ne répond, on ne laisse pas tourner indéfiniment :
-   on rend la main avec un message clair. */
-const limite = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r("__timeout__"), ms))]);
 function getMoteur() {
   return moteurP ||= (async () => {
     if (API) { MODE = "serveur"; return { json: serveurJSON }; }
@@ -901,7 +984,7 @@ function calcPrompt(c) {
   return "\n\nDESCRIPTEURS CALCULÉS sur cette structure par OpenChemLib, dans le navigateur. Ce sont des calculs, pas des estimations : reprends-les tels quels, ne les recalcule pas, et appuie tes raisonnements dessus.\n"
     + CALC_ROWS.map(([k, fn]) => { try { return `- ${k} : ${fn(c)}`; } catch (e) { return null; } }).filter(Boolean).join("\n")
     + `\n- Lipinski : ${c.lipinski.length ? c.lipinski.join(", ") : "aucune violation"}\n- Veber : ${c.veber.length ? c.veber.join(", ") : "respectée"}`
-    + "\nPour un paramètre de la liste ci-dessus, l'assertion porte source \"calcul OpenChemLib sur la structure\" et niveau \"C\". Si une valeur humaine mesurée existe et diffère, ajoute-la comme SECONDE assertion avec sa source et \"divergence\": true.";
+    + "\nPour un paramètre de la liste ci-dessus, l'assertion porte niveau \"predit\", source \"calcul OpenChemLib sur la structure\" et \"methodes\": [\"OpenChemLib\"] suivi de la règle employée. Si une valeur humaine mesurée existe et diffère, ajoute-la comme SECONDE assertion, niveau \"publie\", avec ses références et \"divergence\": true.";
 }
 
 /* ---------------- ionisation à pH 7,4 ---------------- */
@@ -1112,12 +1195,26 @@ function simBlock(d) {
   </div>`;
 }
 
+/* Deux niveaux seulement : une valeur est publiée, et alors elle a des
+   références ; ou elle est prédite, et alors on montre par où le raisonnement
+   est passé. Une valeur dite publiée sans référence est signalée comme telle. */
+const niv = a => (String(a?.niveau || "").toLowerCase().startsWith("pu") || ["A", "B"].includes(a?.niveau)) ? "P" : "S";
+function blocRefs(a, n) {
+  const refs = (a.references || []).filter(r => r && (r.citation || r.titre));
+  const meth = (a.methodes || []).filter(m => m && String(m).trim());
+  let h = "";
+  if (refs.length) h += `<div class="refs"><b>Références</b><ul>${refs.map(r => `<li>${lienRef(r)}</li>`).join("")}</ul></div>`;
+  else if (n === "P") h += '<div class="refs manque"><b>Références</b>Aucune référence précise n\'a été donnée : traite cette valeur comme non sourcée.</div>';
+  if (meth.length) h += `<div class="refs"><b>Démarche suivie</b><ul>${meth.map(m => `<li>${lienOutil(m)}</li>`).join("")}</ul></div>`;
+  return h;
+}
 function asHTML(a) {
-  const n = ["A", "B", "C"].includes(a?.niveau) ? a.niveau : "C";
-  return `<div class="as"><span class="val">${esc(a.valeur)}</span><span class="chip ${n}" title="${n === "A" ? "valeur humaine mesurée" : n === "B" ? "valeur publiée" : "prédiction à partir de la structure"}">${n}</span>
+  const n = niv(a);
+  return `<div class="as"><span class="val">${esc(a.valeur)}</span><span class="chip ${n}" title="${n === "P" ? "valeur mesurée ou publiée" : "prédiction à partir de la structure"}">${n === "P" ? "publiée" : "prédite"}</span>
     <span class="src">${esc(a.source || "prédiction structurale")}</span>
     ${a.divergence ? '<span class="flag">divergence</span>' : ""}
-    ${a.commentaire ? `<span class="note">${esc(a.commentaire)}</span>` : ""}</div>`;
+    ${a.commentaire ? `<span class="note">${esc(a.commentaire)}</span>` : ""}
+    ${blocRefs(a, n)}</div>`;
 }
 function table(rows) {
   if (!Array.isArray(rows) || !rows.length) return '<p class="none">Aucun paramètre renvoyé.</p>';
@@ -1159,16 +1256,17 @@ function panel(d, k) {
            <div class="met-b"><div class="met-draw">${structSVG(d.calc?.smiles || d.smiles, 200) || '<div class="no">—</div>'}</div>
            <div class="hint">Chaque métabolite ci-dessous se lit par rapport à cette structure : le commentaire dit quel site est transformé.</div></div></div>
          <div class="mets">${m.metabolites.map(x => {
-          const n = ["A", "B", "C"].includes(x.niveau) ? x.niveau : "C";
+          const n = niv(x);
           const svg = structSVG(x.smiles, 200);
           return `<div class="met"><div class="t"><strong>${esc(x.nom)}</strong><span class="eyebrow">Phase ${esc(x.phase ?? "?")}</span>
             <span>${esc([x.reaction, x.enzyme, x.part].filter(Boolean).join(" · "))}</span>
             ${x.activite && x.activite !== "inconnu" ? `<span class="${x.activite === "réactif" ? "flag" : "chip B"}">${esc(x.activite)}</span>` : ""}
-            <span class="chip ${n}">${n}</span><span class="src">${esc(x.source || "prédiction structurale")}</span></div>
+            <span class="chip ${n}">${n === "P" ? "publiée" : "prédite"}</span><span class="src">${esc(x.source || "prédiction structurale")}</span></div>
             <div class="met-b">
               <div class="met-draw">${svg || '<div class="no">SMILES non dessinable</div>'}</div>
               <div>${x.smiles ? `<div class="sm">${esc(x.smiles)}</div>` : ""}
-              ${x.commentaire ? `<div class="note" style="margin-top:6px">${esc(x.commentaire)}</div>` : ""}</div>
+              ${x.commentaire ? `<div class="note" style="margin-top:6px">${esc(x.commentaire)}</div>` : ""}
+              ${blocRefs(x, n)}</div>
             </div></div>`;
         }).join("")}</div>`
       : "");
@@ -1280,9 +1378,25 @@ DOS.forEach(x => {
   if (Array.isArray(x.pharmacocinetique)) x.pharmacocinetique = { parametres: x.pharmacocinetique, hypotheses: x.hypotheses, lacunes: x.lacunes };
   const s = x.steps || {};
   if ("mettox" in s) { x.steps = { chim: s.chim || "fail", pk: s.pk || "fail", met: s.mettox || "fail", tox: s.mettox || "fail" }; }
+  /* Anciens dossiers en trois niveaux : A et B deviennent « publiée », C « prédite ». */
+  [x.chimie, x.pharmacocinetique, x.metabolisme, x.toxicologie].forEach(dom => {
+    (dom?.parametres || []).forEach(r => (r.assertions || []).forEach(a => {
+      if (["A", "B"].includes(a.niveau)) a.niveau = "publie";
+      else if (a.niveau === "C") a.niveau = "predit";
+    }));
+  });
+  (x.metabolisme?.metabolites || []).forEach(m => {
+    if (["A", "B"].includes(m.niveau)) m.niveau = "publie";
+    else if (m.niveau === "C") m.niveau = "predit";
+  });
   if (x.metabolisme && x.metabolisme.resume && !x.metabolisme.demarche) x.metabolisme.demarche = x.metabolisme.resume;
   if (x.toxicologie && x.toxicologie.resume && !x.toxicologie.demarche) x.toxicologie.demarche = x.toxicologie.resume;
 });
+
+/* L'onglet « Sources & méthode » est rempli depuis le même catalogue que celui
+   donné au moteur : la liste affichée est exactement celle qu'il peut citer. */
+$("#outils").innerHTML = GROUPES.map(([g, l]) => `<div><h4>${esc(g)}</h4><ul>${l.map(k =>
+  `<li><a href="${OUTILS[k].url}" target="_blank" rel="noopener">${esc(k)}</a> — ${esc(OUTILS[k].q)}</li>`).join("")}</ul></div>`).join("");
 
 /* reprise après rechargement : une étape restée « en cours » est marquée à relancer */
 DOS.forEach(x => Object.keys(x.steps || {}).forEach(k => { if (x.steps[k] === "run" || x.steps[k] === "wait") { x.steps[k] = "fail"; x.errors = x.errors || {}; x.errors[k] = "Analyse interrompue (page fermée ou rechargée)."; } }));
