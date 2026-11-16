@@ -103,8 +103,9 @@ textarea{min-height:76px;resize:vertical}
 .filetag{font-size:12.5px;color:var(--ink-2);display:flex;gap:8px;align-items:center}
 .filetag button{background:none;border:0;color:var(--crit);cursor:pointer;font-size:12.5px;padding:0}
 
-.domains{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-block:22px}
-@media (max-width:900px){.domains{grid-template-columns:repeat(2,1fr)}}
+.domains{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-block:22px}
+@media (max-width:1000px){.domains{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:760px){.domains{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:480px){.domains{grid-template-columns:1fr}}
 .dom{padding:18px;display:flex;flex-direction:column;gap:6px}
 .dom h3{font-family:var(--f-display);font-size:21px;font-weight:600;margin:0}
@@ -204,13 +205,14 @@ footer strong{color:var(--ink-2);font-weight:600}
 .struct .no{font-size:12.5px;color:var(--ink-3);text-align:center;padding:14px;line-height:1.4}
 
 /* tuiles de domaine */
-.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-@media (max-width:760px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media (max-width:980px){.tiles{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.tiles{grid-template-columns:repeat(2,1fr)}}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 14px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;min-width:0}
 .tile:hover{border-color:var(--accent)}
 .tile[aria-current="true"]{border-color:var(--accent);background:var(--accent-soft)}
 .tile svg{width:30px;height:30px;stroke:var(--accent);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.tile b{font-family:var(--f-display);font-size:19px;font-weight:600;line-height:1.1}
+.tile b{font-family:var(--f-display);font-size:18px;font-weight:600;line-height:1.12;overflow-wrap:anywhere;hyphens:auto}
 .tile small{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
 .tile[aria-current="true"] small{color:var(--accent)}
 .tile[data-s="run"] small::before{content:"● ";animation:blink 1s infinite}
@@ -241,6 +243,33 @@ td.p{width:28%;font-weight:600;min-width:130px}
 .refs li{margin:1.5px 0}
 .refs em{font-style:normal;color:var(--ink-3);font-size:11px}
 .refs.manque{color:var(--crit)}
+.conf{font-family:var(--f-mono);font-size:11px;border-radius:4px;padding:0 5px;border:1px solid currentColor}
+.conf.haute{color:var(--A)} .conf.moyenne{color:var(--C)} .conf.basse{color:var(--crit)}
+.met .rang{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.met-st{font-size:12.5px;margin-top:6px}
+.met-st b{font-weight:600}
+.met.reactif{border-color:var(--crit)}
+.met.actif{border-color:var(--B)}
+
+/* conclusion */
+.verdict{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;border-radius:8px;padding:14px 16px;margin-top:14px}
+.verdict.ok{background:var(--A-bg)} .verdict.mid{background:var(--C-bg)} .verdict.no{background:var(--crit-bg)}
+.verdict .mot{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;border-radius:5px;padding:4px 10px;background:var(--surface);white-space:nowrap}
+.verdict.ok .mot{color:var(--A)} .verdict.mid .mot{color:var(--C)} .verdict.no .mot{color:var(--crit)}
+.verdict .t{flex:1;min-width:240px;font-family:var(--f-display);font-size:21px;line-height:1.25}
+.crit-t td.st{width:110px;font-family:var(--f-mono);font-size:12px}
+.crit-t .atteint{color:var(--A)} .crit-t .limite{color:var(--C)} .crit-t .manque{color:var(--crit)}
+.deux{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media (max-width:700px){.deux{grid-template-columns:1fr}}
+.pile{display:flex;flex-direction:column;gap:8px}
+.pile .e{border-left:3px solid var(--line);padding-left:10px}
+.pile.plus .e{border-left-color:var(--A)} .pile.moins .e{border-left-color:var(--crit)}
+.pile .e b{display:block;font-weight:600;font-size:14px}
+.pile .e span{font-size:13px;color:var(--ink-2)}
+.opti{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-top:8px}
+.opti b{display:block;font-weight:600}
+.opti .l{font-size:13px;color:var(--ink-2);margin-top:3px}
+.opti .l em{font-style:normal;color:var(--ink-3)}
 .outils{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:10px}
 .outils h4{margin:0 0 4px;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
 .outils ul{margin:0;padding-left:16px;font-size:13.5px}
@@ -297,7 +326,7 @@ details ul{margin:8px 0 0;padding-left:20px}
       <div>
         <div class="eyebrow">Pharmacie · Projet UEL</div>
         <h1>De la structure <em>à la connaissance.</em></h1>
-        <p>Donne une structure, même celle d'une molécule qui n'existe pas encore : chimie, pharmacocinétique, métabolisme et toxicologie en sont déduits, chaque ligne portant la règle ou la source qui la justifie.</p>
+        <p>Donne une structure, même celle d'une molécule qui n'existe pas encore : chimie, pharmacocinétique, métabolisme et toxicologie en sont déduits, chaque ligne portant la règle ou la source qui la justifie — et la cinquième étape tranche : candidat à pousser, ou à optimiser encore.</p>
       </div>
       <span class="badge">VERSION 01</span>
     </div>
@@ -371,6 +400,7 @@ details ul{margin:8px 0 0;padding-left:20px}
       <div class="card dom"><div class="eyebrow">Étape 02</div><h3>Pharmacocinétique</h3><p>Absorption, distribution et exposition, déduites de cette chimie.</p><div class="n"><b>10</b>paramètres</div></div>
       <div class="card dom"><div class="eyebrow">Étape 03</div><h3>Métabolisme</h3><p>Sites métabolisables, enzymes, transporteurs, métabolites prédits.</p><div class="n"><b>5</b>paramètres</div></div>
       <div class="card dom"><div class="eyebrow">Étape 04</div><h3>Toxicologie</h3><p>Risque de la molécule mère et de chaque métabolite majeur.</p><div class="n"><b>10</b>paramètres</div></div>
+      <div class="card dom"><div class="eyebrow">Étape 05</div><h3>Conclusion</h3><p>Verdict argumenté : pousser la molécule, ou l'optimiser encore.</p><div class="n"><b>1</b>décision</div></div>
     </div>
 
     <div class="card cta">
@@ -395,12 +425,13 @@ details ul{margin:8px 0 0;padding-left:20px}
       <h2>Sources &amp; méthode</h2>
       <div>
         <div class="eyebrow">Ordre de traitement</div>
-        <p>Quatre étapes enchaînées, chacune nourrie par les résultats de la précédente : <strong>chimie</strong>, puis <strong>pharmacocinétique</strong>, puis <strong>métabolisme</strong>, puis <strong>toxicologie</strong>.</p>
+        <p>Cinq étapes enchaînées, chacune nourrie par les résultats des précédentes : <strong>chimie</strong>, puis <strong>pharmacocinétique</strong>, puis <strong>métabolisme</strong>, puis <strong>toxicologie</strong>, et enfin la <strong>conclusion</strong>.</p>
         <ul>
           <li><strong>Chimie.</strong> Lue sur la structure : fonctions, pKa, logP, TPSA, solubilité. Rien ne peut être prédit avant elle.</li>
           <li><strong>Pharmacocinétique.</strong> Déduite de cette chimie : l'absorption de la lipophilie et de la TPSA, le Vd de l'ionisation et de la liaison protéique, la clairance de la stabilité des fonctions portées.</li>
           <li><strong>Métabolisme.</strong> Les sites métabolisables sont cherchés sur la structure, et la clairance prédite à l'étape précédente dit lesquels comptent vraiment. Cette étape peut corriger t½ et CL : elle le signale alors explicitement.</li>
-          <li><strong>Toxicologie.</strong> En dernier, parce qu'elle a besoin des trois autres : la toxicité est cherchée sur la molécule mère <em>et</em> sur chaque métabolite majeur, en tenant compte de l'exposition prédite. Le paracétamol n'est pas toxique, le NAPQI l'est.</li>
+          <li><strong>Conclusion.</strong> Une décision, pas une donnée de plus : les quatre domaines sont confrontés aux seuils usuels d'un candidat médicament oral, et l'étape tranche entre pousser la molécule en développement, l'optimiser encore, ou l'abandonner. Quand elle conclut à une optimisation, elle dit quel fragment changer, pour corriger quel paramètre, et au prix de quel risque.</li>
+          <li><strong>Toxicologie.</strong> Avant-dernière, parce qu'elle a besoin des trois autres : la toxicité est cherchée sur la molécule mère <em>et</em> sur chaque métabolite majeur, en tenant compte de l'exposition prédite. Le paracétamol n'est pas toxique, le NAPQI l'est.</li>
         </ul>
       </div>
       <div>
@@ -418,6 +449,7 @@ details ul{margin:8px 0 0;padding-left:20px}
           <li><span class="chip S">prédite</span> valeur déduite de la structure : chaque ligne montre la <strong>démarche suivie</strong>, deux à quatre étapes, de la plus déterminante à la moins. Les outils dont la méthode est reprise sont cliquables ; une règle (Lipinski, Henderson-Hasselbalch, analogie de série) est nommée en toutes lettres.</li>
         </ul>
         <p>Une ligne annoncée comme publiée mais sans référence est signalée en rouge : c'est une valeur à ne pas reprendre telle quelle.</p>
+        <p>À côté de ce niveau, chaque ligne porte un <strong>score de confiance en pourcentage</strong> : la probabilité, annoncée par le moteur, que la vraie valeur tombe dans l'intervalle ou l'ordre de grandeur qu'il donne. 90 à 100 pour une valeur calculée sur la structure ou lue dans une source identifiée ; 70 à 89 pour une valeur publiée restituée de mémoire, ou une prédiction appuyée sur une règle solide ; 45 à 69 pour une analogie à un facteur 2 ou 3 près ; en dessous de 45, une extrapolation faible. Une valeur dite publiée sans référence nommable est plafonnée à 60. Le score engage le moteur, il ne le dispense pas d'être vérifié : lis-le comme un aveu d'incertitude, pas comme une garantie.</p>
       </div>
       <div>
         <div class="eyebrow">Traçabilité avant interprétation</div>
@@ -609,7 +641,15 @@ const REGLES = `RÈGLES
 - Toute assertion "predit" porte "methodes" : 2 à 4 entrées, la démarche réellement suivie, de la plus déterminante à la moins. Chaque entrée est soit le NOM EXACT d'un outil de la liste ci-dessous dont tu reprends la méthode, soit une règle nommée en toutes lettres ("règle de Lipinski", "Henderson-Hasselbalch sur l'amine tertiaire", "analogie fentanyl/sufentanil", "toxicophore nitroaromatique", "Crippen cLogP par fragments").
 - "source" reste une étiquette courte : en quelques mots, d'où sort la valeur.
 - "commentaire" dit COMMENT tu arrives à la valeur, en une phrase : le fragment lu sur la structure, le calcul posé, l'analogie choisie. C'est ce que l'utilisateur vérifie.
+- Quand tu cites un descripteur déjà calculé (masse molaire, TPSA, logP, liaisons rotables…), recopie EXACTEMENT le chiffre fourni plus haut. Ne le réécris jamais de mémoire : une masse molaire fausse à côté d'une TPSA juste décrédibilise tout le dossier.
 - N'habille jamais une prédiction en valeur publiée : une valeur non mesurée est "predit", même si elle est très plausible. Si deux raisonnements ou deux sources crédibles divergent, donne DEUX assertions avec "divergence": true sur chacune. Un paramètre hors de portée reçoit "assertions": [].
+- "confiance" : un entier de 0 à 100, la probabilité que la vraie valeur tombe dans l'intervalle ou l'ordre de grandeur que tu annonces. Barème imposé, à respecter sans complaisance :
+  · 90-100 : valeur calculée sur la structure, ou lue telle quelle dans un RCP ou une publication que tu identifies précisément.
+  · 70-89 : valeur publiée restituée de mémoire avec sa source, ou prédiction appuyée sur une règle solide et une série très proche.
+  · 45-69 : prédiction par analogie, avec une incertitude réelle d'un facteur 2 à 3.
+  · 20-44 : extrapolation faible, série éloignée, ou paramètre notoirement mal prédit à partir de la structure.
+  · 0-19 : tu réponds surtout pour ne pas laisser la case vide.
+  Une valeur annoncée "publie" dont tu ne peux nommer aucune référence précise plafonne à 60. Ne mets pas 85 partout : un dossier dont toutes les lignes sont au-dessus de 80 est un dossier qui ment.
 - "demarche" résume en 2 à 4 phrases le raisonnement du domaine : ce que tu lis sur la structure, ce que tu en déduis, ce qui reste incertain.
 - Réponds UNIQUEMENT par le JSON demandé.
 
@@ -617,7 +657,7 @@ OUTILS CITABLES dans "methodes" — reprends le nom à l'identique, sans rien y 
 ${GROUPES.map(([g, l]) => `- ${g} : ${l.join(" ; ")}`).join("\n")}
 
 Tu n'as pas accès à internet pendant l'analyse : tu cites ces outils parce que tu en reprends la méthode ou que tu te souviens de leur contenu, jamais parce que tu viens de les consulter. Ne prétends pas avoir ouvert une page. Un outil absent de cette liste ne se cite pas : décris la démarche en toutes lettres à la place.`;
-const AS = `{"valeur":"","niveau":"publie|predit","source":"","references":[{"citation":"","type":"article|rcp|base","pmid":"","doi":""}],"methodes":[""],"commentaire":"","divergence":false}`;
+const AS = `{"valeur":"","niveau":"publie|predit","confiance":0,"source":"","references":[{"citation":"","type":"article|rcp|base","pmid":"","doi":""}],"methodes":[""],"commentaire":"","divergence":false}`;
 
 function mol(d) {
   return `STRUCTURE À ANALYSER\nSMILES = ${d.calc?.smiles || d.smiles || "(non fourni)"}\nNom ou nom de travail = ${d.dci || "(non fourni)"}`
@@ -645,6 +685,7 @@ function acquis(d, keys) {
   const o = [];
   if (keys.includes("chim") && d.chimie) o.push("CHIMIE DÉJÀ ÉTABLIE\n" + vals(d.chimie.parametres));
   if (keys.includes("pk") && d.pharmacocinetique) o.push("PHARMACOCINÉTIQUE DÉJÀ PRÉDITE\n" + vals(d.pharmacocinetique.parametres));
+  if (keys.includes("tox") && d.toxicologie) o.push("TOXICOLOGIE DÉJÀ ÉTABLIE\n" + vals(d.toxicologie.parametres));
   if (keys.includes("met") && d.metabolisme) o.push("MÉTABOLISME DÉJÀ ÉTABLI\n" + vals(d.metabolisme.parametres)
     + "\nMétabolites retenus :\n" + (d.metabolisme.metabolites || []).map(m =>
       `- ${m.nom}${m.smiles ? " [" + m.smiles + "]" : ""} (${[m.reaction, m.enzyme, m.activite].filter(Boolean).join(", ")})`).join("\n"));
@@ -656,7 +697,7 @@ const P = {
 
 ${mol(d)}
 
-ÉTAPE 1 sur 4 : identité et chimie. Tout le reste en dépend, donc lis la structure avant tout : squelette, fonctions portées, centres ionisables, encombrement. Méthode des descripteurs d'ADMETlab 3.0 et de PubChem.
+ÉTAPE 1 sur 5 : identité et chimie. Tout le reste en dépend, donc lis la structure avant tout : squelette, fonctions portées, centres ionisables, encombrement. Méthode des descripteurs d'ADMETlab 3.0 et de PubChem.
 
 ${REGLES}
 
@@ -676,7 +717,7 @@ Renvoie exactement :
 
 ${mol(d)}${acquis(d, ["chim"])}
 
-ÉTAPE 2 sur 4 : pharmacocinétique, déduite de la chimie ci-dessus. Raisonne explicitement : l'absorption depuis la lipophilie, la TPSA et la masse (règle de Lipinski, modèles ADME d'ADMETlab 3.0) ; le volume de distribution depuis l'ionisation à pH 7,4, la lipophilie et la liaison aux protéines ; la clairance depuis la stabilité métabolique attendue des fonctions portées ; la demi-vie depuis Vd et CL (t½ = 0,693·Vd/CL). Pour une molécule connue, la valeur humaine mesurée passe devant la prédiction.
+ÉTAPE 2 sur 5 : pharmacocinétique, déduite de la chimie ci-dessus. ESPÈCE : toutes les valeurs sont données chez l'HUMAIN ADULTE de 70 kg, sauf mention contraire dans le contexte saisi. Chaque valeur de CL et de Vd est donnée À LA FOIS en absolu et rapportée au poids (mL/min/kg et L/kg) : c'est la seule façon de la comparer à des données animales. Indique l'espèce dans "valeur" dès qu'il y a le moindre doute. Raisonne explicitement : l'absorption depuis la lipophilie, la TPSA et la masse (règle de Lipinski, modèles ADME d'ADMETlab 3.0) ; le volume de distribution depuis l'ionisation à pH 7,4, la lipophilie et la liaison aux protéines ; la clairance depuis la stabilité métabolique attendue des fonctions portées ; la demi-vie depuis Vd et CL (t½ = 0,693·Vd/CL). Pour une molécule connue, la valeur humaine mesurée passe devant la prédiction.
 ${bloc}
 
 ${REGLES}
@@ -692,7 +733,7 @@ Renvoie exactement :
 
 ${mol(d)}${acquis(d, ["chim", "pk"])}
 
-ÉTAPE 3 sur 4 : métabolisme. Méthode de BioTransformer 3.0 et de GLORYx : repère sur la structure les sites métabolisables (positions benzyliques, N- et O-déalkylation, hydroxylation aromatique, oxydation des soufres, esters et amides hydrolysables, groupes conjugables), applique les biotransformations de phase I puis II, et classe les métabolites par importance attendue. La clairance prédite à l'étape 2 dit quelles voies comptent vraiment. Si cette étape t'amène à corriger la clairance ou la demi-vie, dis-le dans "demarche".
+ÉTAPE 3 sur 5 : métabolisme. Méthode de BioTransformer 3.0 et de GLORYx : repère sur la structure les sites métabolisables (positions benzyliques, N- et O-déalkylation, hydroxylation aromatique, oxydation des soufres, esters et amides hydrolysables, groupes conjugables), applique les biotransformations de phase I puis II, et classe les métabolites par importance attendue. La clairance prédite à l'étape 2 dit quelles voies comptent vraiment. Si cette étape t'amène à corriger la clairance ou la demi-vie, dis-le dans "demarche".
 
 ${REGLES}
 
@@ -701,13 +742,45 @@ Renvoie exactement :
   "metabolites":[{"nom":"","smiles":"","reaction":"","enzyme":"","phase":1,"activite":"actif|inactif|réactif|inconnu","part":"","source":"","niveau":"publie|predit","methodes":[""],"references":[],"commentaire":""}]}}
 
 "parametres" contient exactement ces 5 paramètres, dans cet ordre : Enzymes de phase I (CYP450 et autres) ; Conjugaisons de phase II ; Transporteurs (P-gp, OATP, BCRP…) ; Voies métaboliques majeures ; Métabolites actifs ou réactifs.
-"metabolites" : huit au maximum, les plus importants, du plus au moins probable. "smiles" est le SMILES du métabolite, obligatoire. "part" estime la part de la dose métabolisée par cette voie (ex. "voie majeure, ~60 %"). "commentaire" dit quel site de la structure est touché.`,
+"metabolites" : huit au maximum, les plus importants, CLASSÉS DU PLUS ABONDANT AU MOINS ABONDANT. "smiles" est le SMILES du métabolite, obligatoire. "part" commence par un pourcentage estimé de la dose métabolisée par cette voie, toujours chiffré (ex. "~60 % de la dose", "~5 % de la dose"), même approximatif : c'est lui qui donne le classement. "activite" vaut exactement "actif" (garde une activité pharmacologique), "inactif" (sans activité ni risque notable), "réactif" (électrophile, conjugaison au glutathion, risque toxique) ou "inconnu", et jamais autre chose. "commentaire" dit quel site de la structure est touché, et pour un métabolite actif ou réactif, ce qu'il implique.`,
+
+  conc: d => `${CADRE}
+
+${mol(d)}${acquis(d, ["chim", "pk", "met", "tox"])}
+
+ÉTAPE 5 sur 5 : conclusion de développement. Tu ne produis plus de nouvelles données : tu TRANCHES à partir des quatre étapes ci-dessus, comme le ferait un comité de sélection de candidat médicament.
+
+La question posée est simple : en l'état, cette molécule mérite-t-elle d'être poussée vers le développement, ou faut-il encore l'optimiser ? Réponds franchement. Un verdict mou n'aide personne.
+
+Méthode imposée :
+1. Confronte chaque domaine aux seuils usuels d'un candidat oral : puissance sur la cible, fenêtre d'exposition, demi-vie compatible avec le rythme de prise visé, biodisponibilité, absence de métabolite réactif majeur, absence d'alerte structurale forte, marge sur hERG.
+2. Dis ce qui tient et ce qui ne tient pas, en nommant à chaque fois la valeur qui te fait conclure.
+3. Si une optimisation est nécessaire, propose des modifications STRUCTURALES précises, pas des intentions : quel fragment, remplacé par quoi, pour corriger quel paramètre, et au prix de quel risque.
+4. Pèse l'incertitude : une conclusion bâtie sur des valeurs à faible confiance doit le dire.
+
+${REGLES}
+
+Renvoie exactement :
+{"conclusion":{"verdict":"poursuivre|optimiser|abandonner","titre":"","demarche":"","confiance":0,
+ "criteres":[{"critere":"","valeur":"","seuil":"","statut":"atteint|limite|manque"}],
+ "atouts":[{"point":"","pourquoi":""}],
+ "faiblesses":[{"point":"","pourquoi":""}],
+ "optimisations":[{"modification":"","objectif":"","risque":""}],
+ "suite":""}}
+
+"verdict" : "poursuivre" si la molécule peut partir en développement en l'état, "optimiser" s'il reste un ou plusieurs verrous à lever sur la structure, "abandonner" si un défaut est rédhibitoire.
+"titre" : la conclusion en une phrase, qui doit se suffire à elle-même.
+"demarche" : 3 à 5 phrases d'argumentation, c'est le cœur de l'étape.
+"criteres" : 6 à 10 lignes, un critère de sélection par ligne, avec la valeur retenue, le seuil usuel, et le statut.
+"optimisations" : vide si le verdict est "poursuivre", sinon 2 à 5 modifications structurales précises.
+"suite" : la prochaine expérience à faire, celle qui lèverait le doute le plus coûteux.
+"confiance" : de 0 à 100, selon le même barème, appliqué au verdict lui-même.`,
 
   tox: d => `${CADRE}
 
 ${mol(d)}${acquis(d, ["chim", "pk", "met"])}
 
-ÉTAPE 4 sur 4 : toxicologie, en dernier parce qu'elle a besoin des trois autres. Méthode de ProTox 3.0 : identifie les fragments porteurs de risque sur la molécule mère ET sur chaque métabolite listé ci-dessus, puis pondère par l'exposition prédite à l'étape 2. Un métabolite réactif minoritaire peut porter l'essentiel du risque (paracétamol et NAPQI) : dis-le. Pour chaque paramètre, précise qui porte le risque, la molécule mère ou un métabolite nommé.
+ÉTAPE 4 sur 5 : toxicologie, en dernier parce qu'elle a besoin des trois autres. Méthode de ProTox 3.0 : identifie les fragments porteurs de risque sur la molécule mère ET sur chaque métabolite listé ci-dessus, puis pondère par l'exposition prédite à l'étape 2. Un métabolite réactif minoritaire peut porter l'essentiel du risque (paracétamol et NAPQI) : dis-le. Pour chaque paramètre, précise qui porte le risque, la molécule mère ou un métabolite nommé.
 
 ${REGLES}
 
@@ -718,14 +791,15 @@ Renvoie exactement :
 };
 
 /* ---------------- analyse ---------------- */
-const ORDER = ["chim", "pk", "met", "tox"];
-const STEPS = { chim: "Chimie", pk: "Pharmacocinétique", met: "Métabolisme", tox: "Toxicologie" };
-const COUNTS = { chim: "9 paramètres", pk: "10 paramètres", met: "5 paramètres", tox: "10 paramètres" };
+const ORDER = ["chim", "pk", "met", "tox", "conc"];
+const STEPS = { chim: "Chimie", pk: "Pharmacocinétique", met: "Métabolisme", tox: "Toxicologie", conc: "Conclusion" };
+const COUNTS = { chim: "9 paramètres", pk: "10 paramètres", met: "5 paramètres", tox: "10 paramètres", conc: "verdict argumenté" };
 const ICONS = {
   chim: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 18.4 7v7.6L12 18.4 5.6 14.6V7z"/><circle cx="12" cy="3.2" r="1.3"/><circle cx="18.4" cy="14.6" r="1.3"/><circle cx="5.6" cy="7" r="1.3"/><path d="M9 9.4h6M9 12h6"/></svg>',
   pk: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 19.5V4.2M3.5 19.5H21"/><path d="M4.5 17.6c2.4-.2 3.6-8.4 6-8.4 2.6 0 3.4 6.6 9.4 2.3"/><circle cx="10.5" cy="9.4" r="1.2"/></svg>',
   met: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.6" cy="7" r="2.4"/><circle cx="18.4" cy="17" r="2.4"/><path d="M8.4 7.8c3.4.6 4.4 3 2.6 5.2M13.6 16.2c-3.4-.6-4.4-3-2.6-5.2"/><path d="M15.8 16.2l-2.2 0 0-2.2M8.2 7.8l2.2 0 0 2.2"/></svg>',
-  tox: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6 21 19.4H3z"/><path d="M12 9.2v5"/><circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"/></svg>'
+  tox: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6 21 19.4H3z"/><path d="M12 9.2v5"/><circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"/></svg>',
+  conc: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.2v15.6M5 8.4h14"/><path d="M5 8.4 2.6 14h4.8zM19 8.4 16.6 14h4.8z"/><path d="M2.6 14a2.4 2.4 0 0 0 4.8 0M16.6 14a2.4 2.4 0 0 0 4.8 0"/><path d="M9.4 19.8h5.2"/></svg>'
 };
 const PENDING = '<div class="pending"><i></i><span>Analyse en cours…</span></div>';
 const ERR = {
@@ -838,7 +912,7 @@ $("#f").addEventListener("submit", async e => {
     dci, smiles, molblock: MOLBLOCK, molname: MOLNAME, tab: "chim",
     calc: calcDesc(smiles), centres: ionCentres(smiles), pka: {},
     ctx: { dose: $("#dose").value.trim(), unit: $("#unit").value, tau: $("#tau").value.trim(), voie: $("#voie").value, form: $("#form").value.trim(), duree: $("#duree").value.trim(), perf: $("#perf").value.trim() },
-    steps: { chim: "wait", pk: "wait", met: "wait", tox: "wait" }, errors: {}
+    steps: { chim: "wait", pk: "wait", met: "wait", tox: "wait", conc: "wait" }, errors: {}
   };
   DOS.unshift(d); CUR = d.id; save();
   show("dossiers");
@@ -1208,9 +1282,17 @@ function blocRefs(a, n) {
   if (meth.length) h += `<div class="refs"><b>Démarche suivie</b><ul>${meth.map(m => `<li>${lienOutil(m)}</li>`).join("")}</ul></div>`;
   return h;
 }
+/* Le score de confiance est affiché tel que le moteur le donne : il engage son
+   propre jugement sur la ligne, et c'est à l'utilisateur d'en tenir compte. */
+function confHTML(x) {
+  const n = Math.round(Number(x?.confiance));
+  if (!isFinite(n) || n < 0 || n > 100) return "";
+  const k = n >= 75 ? "haute" : n >= 45 ? "moyenne" : "basse";
+  return `<span class="conf ${k}" title="Confiance annoncée par le moteur sur cette valeur">${n} %</span>`;
+}
 function asHTML(a) {
   const n = niv(a);
-  return `<div class="as"><span class="val">${esc(a.valeur)}</span><span class="chip ${n}" title="${n === "P" ? "valeur mesurée ou publiée" : "prédiction à partir de la structure"}">${n === "P" ? "publiée" : "prédite"}</span>
+  return `<div class="as"><span class="val">${esc(a.valeur)}</span><span class="chip ${n}" title="${n === "P" ? "valeur mesurée ou publiée" : "prédiction à partir de la structure"}">${n === "P" ? "publiée" : "prédite"}</span>${confHTML(a)}
     <span class="src">${esc(a.source || "prédiction structurale")}</span>
     ${a.divergence ? '<span class="flag">divergence</span>' : ""}
     ${a.commentaire ? `<span class="note">${esc(a.commentaire)}</span>` : ""}
@@ -1221,12 +1303,70 @@ function table(rows) {
   return `<div class="scroll"><table><tbody>${rows.map(r => `<tr><td class="p">${esc(r.parametre)}</td><td>${
     (r.assertions || []).length ? r.assertions.map(asHTML).join("") : '<span class="none">Hors de portée d\'une prédiction fiable.</span>'}</td></tr>`).join("")}</tbody></table></div>`;
 }
+/* Classement des métabolites : on lit le pourcentage annoncé dans "part" et on
+   ordonne dessus. Sans chiffre nulle part, on garde l'ordre du moteur, à qui il
+   est demandé de classer du plus abondant au moins abondant. */
+const pourcent = t => { const m = /(\d+(?:[.,]\d+)?)\s*%/.exec(String(t || "")); return m ? parseFloat(m[1].replace(",", ".")) : null; };
+function metsTries(list) {
+  const a = (list || []).map((m, i) => ({ m, i, p: pourcent(m.part) }));
+  if (a.some(x => x.p != null)) a.sort((x, y) => (y.p ?? -1) - (x.p ?? -1) || x.i - y.i);
+  return a.map(x => x.m);
+}
+const ACT = {
+  "réactif": { cl: "reactif", mot: "réactif — porte un risque toxique", chip: "flag" },
+  "reactif": { cl: "reactif", mot: "réactif — porte un risque toxique", chip: "flag" },
+  "actif": { cl: "actif", mot: "actif — contribue à l'effet", chip: "chip P" },
+  "inactif": { cl: "", mot: "inactif — ni effet ni risque notable", chip: "chip S" },
+  "inconnu": { cl: "", mot: "activité inconnue", chip: "chip S" }
+};
+const acte = x => ACT[String(x || "inconnu").toLowerCase().trim()] || ACT.inconnu;
+
 function demarche(txt) {
   return txt ? `<div class="demarche"><div class="eyebrow">Démarche</div><p>${esc(txt)}</p></div>` : "";
 }
 function liste(title, arr) {
   const a = (arr || []).filter(Boolean);
   return a.length ? `<details style="margin-top:10px"><summary>${title}</summary><ul>${a.map(h => `<li>${esc(h)}</li>`).join("")}</ul></details>` : "";
+}
+
+/* L'étape 5 ne produit pas de paramètres mais une décision : verdict, critères
+   confrontés à leurs seuils, atouts, faiblesses, et modifications proposées. */
+const VERDICTS = {
+  poursuivre: { cl: "ok", mot: "Poursuivre" },
+  optimiser: { cl: "mid", mot: "Optimiser encore" },
+  abandonner: { cl: "no", mot: "Abandonner" }
+};
+function conclusionBlock(d) {
+  const c = d.conclusion || {};
+  const v = VERDICTS[String(c.verdict || "").toLowerCase().trim()] || { cl: "mid", mot: "Sans verdict" };
+  const li = (arr, cls) => (arr || []).filter(x => x && (x.point || x.pourquoi)).map(x =>
+    `<div class="e"><b>${esc(x.point || "")}</b><span>${esc(x.pourquoi || "")}</span></div>`).join("") ;
+  const crit = (c.criteres || []).filter(x => x && x.critere);
+  const opt = (c.optimisations || []).filter(x => x && x.modification);
+  const plus = li(c.atouts), moins = li(c.faiblesses);
+  return `<div class="verdict ${v.cl}">
+      <span class="mot">${esc(v.mot)}</span>
+      <div class="t">${esc(c.titre || "")}</div>
+      ${confHTML(c)}
+    </div>
+    ${c.demarche ? `<div class="demarche"><div class="eyebrow">Argumentation</div><p>${esc(c.demarche)}</p></div>` : ""}
+    ${crit.length ? `<div class="eyebrow" style="margin-top:18px">Critères de sélection d'un candidat</div>
+      <div class="scroll"><table class="crit-t"><tbody>${crit.map(x => {
+        const st = String(x.statut || "").toLowerCase().trim();
+        const cl = st === "atteint" ? "atteint" : st === "limite" ? "limite" : "manque";
+        const mot = cl === "atteint" ? "atteint" : cl === "limite" ? "limite" : "manqué";
+        return `<tr><td class="p">${esc(x.critere)}</td><td>${esc(x.valeur || "—")}<div class="note">seuil usuel : ${esc(x.seuil || "—")}</div></td><td class="st ${cl}">${mot}</td></tr>`;
+      }).join("")}</tbody></table></div>` : ""}
+    ${plus || moins ? `<div class="deux">
+      ${plus ? `<div><div class="eyebrow">Ce qui tient</div><div class="pile plus" style="margin-top:8px">${plus}</div></div>` : ""}
+      ${moins ? `<div><div class="eyebrow">Ce qui ne tient pas</div><div class="pile moins" style="margin-top:8px">${moins}</div></div>` : ""}
+    </div>` : ""}
+    ${opt.length ? `<div class="eyebrow" style="margin-top:18px">Modifications proposées</div>
+      ${opt.map(x => `<div class="opti"><b>${esc(x.modification)}</b>
+        <div class="l">Objectif : ${esc(x.objectif || "—")}</div>
+        ${x.risque ? `<div class="l"><em>Risque : ${esc(x.risque)}</em></div>` : ""}</div>`).join("")}` : ""}
+    ${c.suite ? `<div class="box warn" style="margin-top:16px"><strong>Prochaine expérience à faire :</strong> ${esc(c.suite)}</div>` : ""}
+    <p class="hint" style="margin-top:14px">Ce verdict est un avis de méthode, construit sur les quatre étapes précédentes : il vaut ce que valent leurs valeurs, dont les scores de confiance sont affichés ligne par ligne.</p>`;
 }
 
 function panel(d, k) {
@@ -1252,16 +1392,17 @@ function panel(d, k) {
     const m = d.metabolisme || {};
     return demarche(m.demarche) + table(m.parametres) + ((m.metabolites || []).length
       ? `<div class="eyebrow" style="margin-top:18px">Molécule mère et métabolites prédits</div>
+         <p class="hint" style="margin:6px 0 0">Classés du plus abondant au moins abondant, d'après la part de la dose estimée pour chaque voie.</p>
          <div class="met mere"><div class="t"><strong>${esc(d.identite?.dci || d.dci || "Molécule mère")}</strong><span class="eyebrow">point de départ</span></div>
            <div class="met-b"><div class="met-draw">${structSVG(d.calc?.smiles || d.smiles, 200) || '<div class="no">—</div>'}</div>
            <div class="hint">Chaque métabolite ci-dessous se lit par rapport à cette structure : le commentaire dit quel site est transformé.</div></div></div>
-         <div class="mets">${m.metabolites.map(x => {
-          const n = niv(x);
+         <div class="mets">${metsTries(m.metabolites).map((x, rang) => {
+          const n = niv(x), a = acte(x.activite);
           const svg = structSVG(x.smiles, 200);
-          return `<div class="met"><div class="t"><strong>${esc(x.nom)}</strong><span class="eyebrow">Phase ${esc(x.phase ?? "?")}</span>
+          return `<div class="met ${a.cl}"><div class="t"><span class="rang">N° ${rang + 1}</span><strong>${esc(x.nom)}</strong><span class="eyebrow">Phase ${esc(x.phase ?? "?")}</span>
             <span>${esc([x.reaction, x.enzyme, x.part].filter(Boolean).join(" · "))}</span>
-            ${x.activite && x.activite !== "inconnu" ? `<span class="${x.activite === "réactif" ? "flag" : "chip B"}">${esc(x.activite)}</span>` : ""}
-            <span class="chip ${n}">${n === "P" ? "publiée" : "prédite"}</span><span class="src">${esc(x.source || "prédiction structurale")}</span></div>
+            <span class="${a.chip}">${esc(a.mot)}</span>
+            <span class="chip ${n}">${n === "P" ? "publiée" : "prédite"}</span>${confHTML(x)}<span class="src">${esc(x.source || "prédiction structurale")}</span></div>
             <div class="met-b">
               <div class="met-draw">${svg || '<div class="no">SMILES non dessinable</div>'}</div>
               <div>${x.smiles ? `<div class="sm">${esc(x.smiles)}</div>` : ""}
@@ -1271,8 +1412,11 @@ function panel(d, k) {
         }).join("")}</div>`
       : "");
   }
-  const t = d.toxicologie || {};
-  return demarche(t.demarche) + table(t.parametres);
+  if (k === "tox") {
+    const t = d.toxicologie || {};
+    return demarche(t.demarche) + table(t.parametres);
+  }
+  return conclusionBlock(d);
 }
 
 function renderDossiers() {
@@ -1333,11 +1477,11 @@ function renderDossiers() {
     </button>`).join("")}</div>
 
   <div class="card">
-    <div class="sec-h"><h3>${STEPS[tab]}</h3><span class="eyebrow">Étape ${ORDER.indexOf(tab) + 1} sur 4 · ${COUNTS[tab]}</span></div>
+    <div class="sec-h"><h3>${STEPS[tab]}</h3><span class="eyebrow">Étape ${ORDER.indexOf(tab) + 1} sur ${ORDER.length} · ${COUNTS[tab]}</span></div>
     <div class="sec-b">${panel(d, tab)}</div>
   </div>
 
-  <p class="hint">Niveau A : valeur humaine mesurée · B : valeur publiée · C : prédiction à partir de la structure. La colonne de droite nomme la source ou la règle employée : c'est par là que se vérifie une valeur.</p>`;
+  <p class="hint">Deux niveaux : <strong>publiée</strong>, avec ses références, et <strong>prédite</strong>, avec la démarche suivie. Le pourcentage est la confiance que le moteur annonce sur la ligne : en dessous de 45 %, traite la valeur comme un ordre de grandeur.</p>`;
 
   const svg = structSVG(smi);
   $("#struct", out).innerHTML = svg || `<div class="no">${smi
@@ -1397,6 +1541,15 @@ DOS.forEach(x => {
    donné au moteur : la liste affichée est exactement celle qu'il peut citer. */
 $("#outils").innerHTML = GROUPES.map(([g, l]) => `<div><h4>${esc(g)}</h4><ul>${l.map(k =>
   `<li><a href="${OUTILS[k].url}" target="_blank" rel="noopener">${esc(k)}</a> — ${esc(OUTILS[k].q)}</li>`).join("")}</ul></div>`).join("");
+
+/* Dossiers analysés avant l'ajout de la conclusion : l'étape existe, mais vide. */
+DOS.forEach(x => {
+  if (x.steps && !("conc" in x.steps)) {
+    x.steps.conc = "fail";
+    x.errors = x.errors || {};
+    x.errors.conc = "Cette étape a été ajoutée après l'analyse de ce dossier. Relance-la pour obtenir la conclusion.";
+  }
+});
 
 /* reprise après rechargement : une étape restée « en cours » est marquée à relancer */
 DOS.forEach(x => Object.keys(x.steps || {}).forEach(k => { if (x.steps[k] === "run" || x.steps[k] === "wait") { x.steps[k] = "fail"; x.errors = x.errors || {}; x.errors[k] = "Analyse interrompue (page fermée ou rechargée)."; } }));
